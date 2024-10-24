@@ -1,0 +1,24 @@
+version: '4'
+
+services:
+  # mysql:
+  #   image: mysql:8.4
+  #   environment:
+  #     - MYSQL_DATABASE=msa
+  #     - MYSQL_USER=user
+  #     - MYSQL_PASSWORD=pass
+  #     - MYSQL_ROOT_PASSWORD=pass
+  #     - TZ=Asia/Tokyo
+  #   ports:
+  #     - 3306:3306
+  #   volumes:
+  #     - ./database/mysql/conf:/etc/mysql/conf.d/:ro
+  #     - ./database/data/mysql/:/var/lib/mysql
+
+  redis:
+    image: redis:7.4.1
+    ports:
+      - 6379:6379
+    volumes:
+      - ./database/data/redis/:/data
+    command: redis-server
