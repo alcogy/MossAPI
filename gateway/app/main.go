@@ -5,18 +5,10 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"slices"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
-
-type Service struct {
-	Method string `redis:"method"`
-	Url    string `redis:"url"`
-	Query  string `redis:"query"`
-}
 
 func getClient() *redis.Client {
 	return redis.NewClient(&redis.Options{
@@ -27,17 +19,16 @@ func getClient() *redis.Client {
 	})
 }
 
-func GetServicerInfo(service string) Service {
+func GetModuleURL(service string) string {
 	db := getClient()
 	ctx := context.Background()
 
-	var result Service
-	err := db.HGetAll(ctx, service).Scan(&result)
+	url, err := db.Get(ctx, service).Result()
 	if err != nil {
 		panic(err)
 	}
 
-	return result
+	return url
 }
 
 func RunReverseProxy(ctx *gin.Context) {
@@ -47,16 +38,14 @@ func RunReverseProxy(ctx *gin.Context) {
 	if service == "" {
 		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": service + " is not found."})
 	}
+
 	// Get and confirm service info
-	res := GetServicerInfo(service)
+	module := GetModuleURL(service)
+
 	// for URL.
-	remote, err := url.Parse(res.Url)
+	remote, err := url.Parse(module)
 	if err != nil {
 		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": service + " is failed."})
-	}
-	// for Method.
-	if !slices.Contains(strings.Split(res.Method, "/"), ctx.Request.Method) {
-		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": service + " is not found."})
 	}
 
 	// Make reverce proxy director.
