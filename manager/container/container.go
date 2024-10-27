@@ -51,12 +51,16 @@ func run(service string, port string) {
 	exec.Command("cmd", "/c", "docker", "run", "-p", connect, "--name", service, "-d", service).Output()
 }
 
+// ----------------------------------------------------
+// Delete container and docker image.
 func RemoveContainerAndImage(service string) {
 	StopContainer(service)
 	exec.Command("cmd", "/c", "docker", "rm", service).Output()
 	exec.Command("cmd", "/c", "docker", "rmi", service).Output()
 }
 
+// ----------------------------------------------------
+// Just stop container.
 func StopContainer(service string) {
 	exec.Command("cmd", "/c", "docker", "stop", service).Output()
 }
