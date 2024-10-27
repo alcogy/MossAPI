@@ -5,14 +5,17 @@ import (
 	"io"
 	"io/fs"
 	"manager/container"
+	"manager/database/mysql"
 	"manager/database/redis"
 	"manager/model"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
-func SwitchCommand(flags model.Flags) {
+func SwitchCommand(flags model.Flags, db *sqlx.DB) {
 	switch flags.Command {
 	case "check":
 		Check(flags)
@@ -32,6 +35,9 @@ func SwitchCommand(flags model.Flags) {
 	case "copy":
 		CopyArtifact(flags)
 
+	case "db":
+		DoDB(flags, db)
+
 	default:
 		message := "Not Found command \"%s\".\n"
 		message += "You can use commands are below.\n"
@@ -46,6 +52,7 @@ func SwitchCommand(flags model.Flags) {
 	}
 }
 
+// ----------------------------------------
 // Check exist service
 func Check(flags model.Flags) {
 	port, err := redis.GetPort(flags.Service)
@@ -56,6 +63,8 @@ func Check(flags model.Flags) {
 	}
 }
 
+// ----------------------------------------
+// Build image and run container.
 func Run(flags model.Flags) {
 	// Check Exist Service
 	port, err := redis.GetPort(flags.Service)
@@ -66,6 +75,8 @@ func Run(flags model.Flags) {
 	}
 }
 
+// ----------------------------------------
+// Generate Dockerfile with content. And Run Container.
 func Gen(flags model.Flags) {
 	// Check port number from command args.
 	if flags.Service == "" || flags.Port == "" {
@@ -92,12 +103,16 @@ func Gen(flags model.Flags) {
 	container.BuildAndRun(flags.Service, flags.Port)
 }
 
+// ----------------------------------------
+// Remove container, docker image and service directory
 func Remove(flags model.Flags) {
 	container.RemoveContainerAndImage(flags.Service)
 	redis.DeleteService(flags.Service)
 	os.RemoveAll("../services/" + flags.Service)
 }
 
+// ----------------------------------------
+// Copy artifact for api to service directory.
 func CopyArtifact(flags model.Flags) {
 	filepath.Walk(flags.Artifact, func (path string, info fs.FileInfo, err error) error {
 		if err != nil {
@@ -134,3 +149,11 @@ func CopyArtifact(flags model.Flags) {
 	})
 }
 
+// ----------------------------------------
+// Experimental DB actions. TODO: Delete
+func DoDB(flags model.Flags, db *sqlx.DB) {
+	// TODO Implement generate DDL.
+	//mysql.ExecuteDDL(db, "CREATE TABLE `gett` (`id` int not null, `name` varchar(255) not null);")
+	tables := mysql.FetchAllTable(db)
+	fmt.Printf("%v", tables)
+}
