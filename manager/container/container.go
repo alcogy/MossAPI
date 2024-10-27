@@ -1,6 +1,7 @@
 package container
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -34,8 +35,9 @@ func GenerateDockerfile(service string, content string) {
 // ----------------------------------------------------
 // Make docker image from Dockerfile and run conteiner.
 func MakeAndRun(service string, port string) {
-	// 
+	fmt.Println("Make container " + service)
 	make(service)
+	fmt.Println("Run container " + service)
 	run(service, port)
 }
 
