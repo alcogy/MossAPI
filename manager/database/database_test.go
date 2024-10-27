@@ -1,12 +1,22 @@
-// TODO Move file place to correct.
-package main
+package database
 
 import (
 	"manager/database/redis"
+	"os"
 	"testing"
 )
 
+func beforeAll(t *testing.T) {
+	cwd, _ := os.Getwd()
+	t.Cleanup(func() {
+		os.Chdir(cwd)
+	})
+	os.Chdir("../")
+}
+
 func TestFetchAllData(t *testing.T) {
+	beforeAll(t)
+
 	data := map[string]string{
 		"customer": "12050",
 		"hello": "12020",
@@ -28,6 +38,8 @@ func TestFetchAllData(t *testing.T) {
 }
 
 func TestCheckExistService(t *testing.T) {
+	beforeAll(t)
+
 	if !redis.CheckExistService("customer") {
 		t.Fatalf("%v is exist.", "customer")
 	}
@@ -38,6 +50,8 @@ func TestCheckExistService(t *testing.T) {
 }
 
 func TestCheckPortNumberFree(t *testing.T) {
+	beforeAll(t)
+
 	if redis.CheckPortNumberFree("12050") {
 		t.Fatalf("%v is not free.", "12050")
 	}
@@ -48,7 +62,9 @@ func TestCheckPortNumberFree(t *testing.T) {
 }
 
 func TestSetService(t *testing.T) {
-	err := redis.SetService("jone", "120900")
+	beforeAll(t)
+
+	err := redis.SetService("franc", "12100")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,6 +77,8 @@ func TestSetService(t *testing.T) {
 }
 
 func TestDeleteService(t *testing.T) {
+	beforeAll(t)
+	
 	err := redis.DeleteService("jone")
 	if err != nil {
 		t.Fatal(err)

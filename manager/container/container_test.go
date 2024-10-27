@@ -1,13 +1,21 @@
 package container
 
 import (
-	"fmt"
+	"os"
 	"testing"
 )
 
+func beforeAll(t *testing.T) {
+	cwd, _ := os.Getwd()
+	t.Cleanup(func() {
+		os.Chdir(cwd)
+	})
+	os.Chdir("../")
+}
 func TestGenerateContent(t *testing.T) {
-	content := GenerateContent("franc", "9000", nil)
-	fmt.Println(content)
-	// GenerateDockerfile("franc", content)
+	beforeAll(t)
+	
+	content := GenerateContent("franc", []string{"golang-go", "dotnet-sdk-8.0"})
+	GenerateDockerfile("franc", content)
 	//TODO COPY binnary file to service dir.
 }

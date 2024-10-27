@@ -65,6 +65,20 @@ func CheckExistService(service string) bool {
 	return port != ""
 }
 
+func GetPort(service string) (string, error) {
+	db := connection()
+	defer db.Close()
+
+	ctx := context.Background()
+
+	port, err := db.Get(ctx, service).Result()
+	if err != nil {
+		return "", err
+	}
+
+	return port, nil
+}
+
 func CheckPortNumberFree(port string) bool {
 	kvs := FetchAllData()
 	for _, v := range kvs {

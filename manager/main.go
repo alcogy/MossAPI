@@ -24,19 +24,20 @@ func main() {
 	
 	switch flags.Command {
 	case "check":
-		result := redis.CheckExistService(flags.Service)
-		if result {
-			fmt.Println("exists")
-		} else {
+		port, err := redis.GetPort(flags.Service)
+		if err != nil || port == "" {
 			fmt.Println("not exists")
+		} else {
+			fmt.Println("exists")
 		}
 		
 	case "run":
 		// Check Exist Service
-		if !redis.CheckExistService(flags.Service) {
+		port, err := redis.GetPort(flags.Service)
+		if err != nil && port != "" {
 			fmt.Printf("%v is not exist", flags.Service)
 		} else {
-			container.MakeAndRun(flags.Service, flags.Port)
+			container.BuildAndRun(flags.Service, port)
 		}
 
 	case "stop":
@@ -44,6 +45,11 @@ func main() {
 
 	case "gen":
 		// Check port number from command args.
+		if flags.Service == "" || flags.Port == "" {
+			fmt.Printf("You must specify service name and port number.")
+			return
+		}
+
 		if !redis.CheckPortNumberFree(flags.Port) {
 			fmt.Printf("%v port is not free.", flags.Port)
 			return
@@ -56,7 +62,7 @@ func main() {
 		}
 		
 		container.GenerateDockerfile(flags.Service, "FROM httpd\n\nEXPOSE 80\n\n")
-		container.MakeAndRun(flags.Service, flags.Port)
+		container.BuildAndRun(flags.Service, flags.Port)
 
 	case "rm":
 		container.RemoveContainerAndImage(flags.Service)
