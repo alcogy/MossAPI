@@ -7,18 +7,20 @@ import (
 	"os/exec"
 )
 
+func GetServiceDir(service string) string {
+	return  "../services/" + service
+}
+
 // ----------------------------------------------------
 // Generate Dockerfile with content to service directory.
 func GenerateDockerfile(service string, content string) {
-	path := "../services/" + service
-	
+	path := GetServiceDir(service) 
 	// Make service directory if not exsist.
 	info, err := os.Stat(path)
-	fmt.Println(info)
+	
 	if err != nil || info == nil || !info.IsDir() {
 		os.Mkdir(path, 0750)
 	}
-	fmt.Println(path)
 	// Create blank docker file.
 	f, err := os.Create(path + "/Dockerfile")
 	if err != nil {
@@ -41,9 +43,16 @@ func BuildAndRun(service string, port string) {
 }
 
 func build(service string) {
+	
 	fmt.Println("Make container " + service)
-	path := "../services/" + service
-	exec.Command("cmd", "/c", "docker", "build", "-t", service, path).Output()
+	path := GetServiceDir(service)
+	fmt.Println(path)
+	out, err := exec.Command("cmd", "/c", "docker", "build", "-t", service, path).Output()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(out))
 }
 
 func run(service string, port string) {
@@ -63,5 +72,12 @@ func RemoveContainerAndImage(service string) {
 // ----------------------------------------------------
 // Just stop container.
 func StopContainer(service string) {
+	// cli, err := client.NewClientWithOpts(client.FromEnv)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer cli.Close()
+	// ctx := context.Background()
+	// cli.ContainerStop(ctx, service, container.StopOptions{})
 	exec.Command("cmd", "/c", "docker", "stop", service).Output()
 }

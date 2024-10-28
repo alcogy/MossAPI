@@ -37,7 +37,7 @@ func SwitchCommand(flags model.Flags, db *sqlx.DB) {
 
 	case "db":
 		DoDB(flags, db)
-
+	
 	default:
 		message := "Not Found command \"%s\".\n"
 		message += "You can use commands are below.\n"
@@ -66,6 +66,10 @@ func Check(flags model.Flags) {
 // ----------------------------------------
 // Build image and run container.
 func Run(flags model.Flags) {
+	if flags.Service == "" || flags.Port == "" {
+		fmt.Printf("You must specify service name and port number.")
+		return
+	}
 	// Check Exist Service
 	port, err := redis.GetPort(flags.Service)
 	if err != nil && port != "" {
@@ -79,8 +83,8 @@ func Run(flags model.Flags) {
 // Generate Dockerfile with content. And Run Container.
 func Gen(flags model.Flags) {
 	// Check port number from command args.
-	if flags.Service == "" || flags.Port == "" {
-		fmt.Printf("You must specify service name and port number.")
+	if flags.Service == "" {
+		fmt.Printf("You must specify service name.")
 		return
 	}
 
@@ -98,9 +102,6 @@ func Gen(flags model.Flags) {
 	// Make Dockerfile with content.
 	content := container.GenerateContent(flags.Service, nil)
 	container.GenerateDockerfile(flags.Service, content)
-
-	// Copy Artifacts
-	container.BuildAndRun(flags.Service, flags.Port)
 }
 
 // ----------------------------------------
@@ -108,7 +109,7 @@ func Gen(flags model.Flags) {
 func Remove(flags model.Flags) {
 	container.RemoveContainerAndImage(flags.Service)
 	redis.DeleteService(flags.Service)
-	os.RemoveAll("../services/" + flags.Service)
+	os.RemoveAll(container.GetServiceDir(flags.Service))
 }
 
 // ----------------------------------------
