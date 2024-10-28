@@ -1,10 +1,18 @@
 package container
 
 import (
+	"archive/tar"
+	"bytes"
+	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 )
 
 func GetServiceDir(service string) string {
@@ -43,17 +51,81 @@ func BuildAndRun(service string, port string) {
 }
 
 func build(service string) {
-	
-	fmt.Println("Make container " + service)
-	path := GetServiceDir(service)
-	fmt.Println(path)
-	out, err := exec.Command("cmd", "/c", "docker", "build", "-t", service, path).Output()
+	ctx := context.Background()
+
+	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
+	}
+	cli.NegotiateAPIVersion(ctx)
+
+	path, _ := filepath.Abs(GetServiceDir(service) + "/Dockerfile")
+	
+	res, err := cli.ImageBuild(
+		ctx,
+		makebuildContext(path),
+		types.ImageBuildOptions{
+			Dockerfile: path,
+			Remove:     true,
+			Tags:       []string{"tag:"+ service},
+		},
+	)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer res.Body.Close()
+
+	io.Copy(os.Stdout, res.Body)
+}
+
+func makebuildContext(path string) *bytes.Reader {
+	f, err := os.Open(path)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Panic(err)
+		}
+	}()
+	byteData, err := io.ReadAll(f)
+	if err != nil {
+		log.Panic(err)
 	}
 
-	fmt.Println(string(out))
+	buf := new(bytes.Buffer)
+	tw := tar.NewWriter(buf)
+	defer tw.Close()
+
+	err = tw.WriteHeader(&tar.Header{
+		Name: path,
+		Size: int64(len(byteData)),
+	})
+	if err != nil {
+		log.Panic(err)
+	}
+
+	_, err = tw.Write(byteData)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return bytes.NewReader(buf.Bytes())
 }
+
+
+// func build(service string) {
+	
+// 	fmt.Println("Make container " + service)
+// 	path := GetServiceDir(service)
+// 	fmt.Println(path)
+// 	out, err := exec.Command("cmd", "/c", "docker", "build", "-t", service, path).Output()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	fmt.Println(string(out))
+// }
 
 func run(service string, port string) {
 	fmt.Println("Run container " + service)
