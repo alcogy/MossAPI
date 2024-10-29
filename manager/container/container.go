@@ -4,15 +4,19 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
-	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/docker/go-connections/nat"
 )
 
 func GetServiceDir(service string) string {
@@ -44,13 +48,9 @@ func GenerateDockerfile(service string, content string) {
 }
 
 // ----------------------------------------------------
-// Make docker image from Dockerfile and run conteiner.
+// BuildAndRun makes docker image and run conteiner.
+// Image build with tar style byte data.
 func BuildAndRun(service string, port string) {
-	build(service)
-	run(service, port)
-}
-
-func build(service string) {
 	ctx := context.Background()
 
 	cli, err := client.NewClientWithOpts(client.FromEnv)
@@ -59,15 +59,20 @@ func build(service string) {
 	}
 	cli.NegotiateAPIVersion(ctx)
 
-	path, _ := filepath.Abs(GetServiceDir(service) + "/Dockerfile")
+	build(&ctx, cli, service)
+	run(&ctx, cli, service, port)
+}
+
+func build(ctx *context.Context, cli *client.Client, service string) {
+	path, _ := filepath.Abs(GetServiceDir(service))
 	
 	res, err := cli.ImageBuild(
-		ctx,
+		*ctx,
 		makebuildContext(path),
 		types.ImageBuildOptions{
-			Dockerfile: path,
+			Dockerfile: "Dockerfile",
 			Remove:     true,
-			Tags:       []string{"tag:"+ service},
+			Tags:       []string{service},
 		},
 	)
 	if err != nil {
@@ -75,62 +80,100 @@ func build(service string) {
 	}
 	defer res.Body.Close()
 
+	// Print from docker message.
 	io.Copy(os.Stdout, res.Body)
 }
 
-func makebuildContext(path string) *bytes.Reader {
-	f, err := os.Open(path)
-	if err != nil {
-		log.Panic(err)
-	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			log.Panic(err)
-		}
-	}()
-	byteData, err := io.ReadAll(f)
-	if err != nil {
-		log.Panic(err)
-	}
-
+func makebuildContext(root string) *bytes.Reader {
+	// Make buffer
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
 
-	err = tw.WriteHeader(&tar.Header{
-		Name: path,
-		Size: int64(len(byteData)),
-	})
-	if err != nil {
-		log.Panic(err)
-	}
+	if err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+		
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
 
-	_, err = tw.Write(byteData)
-	if err != nil {
-		log.Panic(err)
+		f, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		// Make file name relative from root(args) path.
+		file := strings.Replace(filepath.ToSlash(path), filepath.ToSlash(root + "\\"), "", -1)
+		
+		// Write header info.
+		if err := tw.WriteHeader(&tar.Header{
+			Name: file,
+			Size: info.Size(),
+			Mode: 0755,
+			ModTime: info.ModTime(),
+		}); err != nil {
+			return err
+		}
+
+		// Write body data.
+		if _, err := io.Copy(tw, f); err != nil {
+			return err
+		}
+		
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 
 	return bytes.NewReader(buf.Bytes())
 }
 
+func run(ctx *context.Context, cli *client.Client, service string, port string) {
+	res, err := cli.ContainerCreate(
+		*ctx,
+		&container.Config{ Image: service, ExposedPorts: nat.PortSet{"9000/tcp": struct{}{}} },
+		&container.HostConfig{
+			PortBindings: nat.PortMap{nat.Port("9000/tcp"): []nat.PortBinding{
+				{
+					HostIP: "0.0.0.0",
+					HostPort: port,
+				},
+			}},
+		},
+		nil,
+		nil,
+		service,
+	)
+	if err != nil {
+		panic(err)
+	}
 
-// func build(service string) {
-	
-// 	fmt.Println("Make container " + service)
-// 	path := GetServiceDir(service)
-// 	fmt.Println(path)
-// 	out, err := exec.Command("cmd", "/c", "docker", "build", "-t", service, path).Output()
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	if err := cli.ContainerStart(
+		*ctx,
+		res.ID,
+		container.StartOptions{},
+	); err != nil {
+		panic(err)
+	}
 
-// 	fmt.Println(string(out))
-// }
+	statusCh, errCh := cli.ContainerWait(*ctx, res.ID, container.WaitConditionNotRunning)
+	select {
+	case err := <-errCh:
+		if err != nil {
+			panic(err)
+		}
+	case <-statusCh:
+	}
 
-func run(service string, port string) {
-	fmt.Println("Run container " + service)
-	connect := port + ":9000"
-	exec.Command("cmd", "/c", "docker", "run", "-p", connect, "--name", service, "-d", service).Output()
+	out, err := cli.ContainerLogs(*ctx, res.ID, container.LogsOptions{ShowStdout: true})
+	if err != nil {
+		panic(err)
+	}
+
+	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 }
 
 // ----------------------------------------------------

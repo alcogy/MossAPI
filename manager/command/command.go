@@ -66,8 +66,11 @@ func Check(flags model.Flags) {
 // ----------------------------------------
 // Build image and run container.
 func Run(flags model.Flags) {
-	if flags.Service == "" || flags.Port == "" {
-		fmt.Printf("You must specify service name and port number.")
+	// TODO This line is for dev and debug.
+	Remove(flags)
+
+	if flags.Service == "" {
+		fmt.Printf("You must specify service name.")
 		return
 	}
 	// Check Exist Service
@@ -75,7 +78,9 @@ func Run(flags model.Flags) {
 	if err != nil && port != "" {
 		fmt.Printf("%v is not exist", flags.Service)
 	} else {
-		container.BuildAndRun(flags.Service, port)
+		// container.BuildAndRun(flags.Service, port)
+		// TODO This line is for dev and debug.
+		container.BuildAndRun(flags.Service, flags.Port)
 	}
 }
 
@@ -83,8 +88,8 @@ func Run(flags model.Flags) {
 // Generate Dockerfile with content. And Run Container.
 func Gen(flags model.Flags) {
 	// Check port number from command args.
-	if flags.Service == "" {
-		fmt.Printf("You must specify service name.")
+	if flags.Service == "" || flags.Port == "" {
+		fmt.Printf("You must specify service name and port number.")
 		return
 	}
 
@@ -109,7 +114,8 @@ func Gen(flags model.Flags) {
 func Remove(flags model.Flags) {
 	container.RemoveContainerAndImage(flags.Service)
 	redis.DeleteService(flags.Service)
-	os.RemoveAll(container.GetServiceDir(flags.Service))
+	// TODO Cooment out for dev and debug.
+	// os.RemoveAll(container.GetServiceDir(flags.Service))
 }
 
 // ----------------------------------------
