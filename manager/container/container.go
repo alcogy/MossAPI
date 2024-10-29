@@ -4,16 +4,18 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/fs"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
@@ -71,7 +73,6 @@ func build(ctx *context.Context, cli *client.Client, service string) {
 		makebuildContext(path),
 		types.ImageBuildOptions{
 			Dockerfile: "Dockerfile",
-			Remove:     true,
 			Tags:       []string{service},
 		},
 	)
@@ -178,21 +179,68 @@ func run(ctx *context.Context, cli *client.Client, service string, port string) 
 
 // ----------------------------------------------------
 // Delete container and docker image.
+// TODO Delete conteiner and image not perfect.
 func RemoveContainerAndImage(service string) {
 	StopContainer(service)
-	exec.Command("cmd", "/c", "docker", "rm", service).Output()
-	exec.Command("cmd", "/c", "docker", "rmi", service).Output()
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		panic(err)
+	}
+	defer cli.Close()
+	ctx := context.Background()
+
+	containers, err := cli.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		panic(err)
+	}
+	for _, v := range containers {
+		if v.Names[0] == "/" + service {
+			cli.ContainerRemove(ctx, v.ID, container.RemoveOptions{})
+			cli.ContainersPrune(ctx, filters.Args{})
+		}
+	}
+
+	images, err := cli.ImageList(ctx, image.ListOptions{All: false})
+	if err != nil {
+		panic(err)
+	}
+	for _, img := range images {
+		if len(img.RepoTags) == 0 {
+			continue
+		}
+		tags := strings.Split(img.RepoTags[0], ":")
+		if tags[0] == service {
+			fmt.Println(img.ID)
+			cli.ImageRemove(ctx, img.ID, image.RemoveOptions{Force: true, PruneChildren: true})
+			cli.ImagesPrune(ctx, filters.Args{})
+		}
+	}
+	
+	fmt.Println("Remove container and image.")
+	// exec.Command("cmd", "/c", "docker", "rm", service).Output()
+	// exec.Command("cmd", "/c", "docker", "rmi", service).Output()
 }
 
 // ----------------------------------------------------
 // Just stop container.
 func StopContainer(service string) {
-	// cli, err := client.NewClientWithOpts(client.FromEnv)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer cli.Close()
-	// ctx := context.Background()
-	// cli.ContainerStop(ctx, service, container.StopOptions{})
-	exec.Command("cmd", "/c", "docker", "stop", service).Output()
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		panic(err)
+	}
+	defer cli.Close()
+	ctx := context.Background()
+
+	containers, err := cli.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		panic(err)
+	}
+
+	for _, v := range containers {
+		if v.Names[0] == "/" + service {
+			cli.ContainerStop(ctx, v.ID, container.StopOptions{})
+			fmt.Println("Stop container.")
+		}
+	}
+	// exec.Command("cmd", "/c", "docker", "stop", service).Output()
 }
