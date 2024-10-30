@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Admin::Moss - modular synthesis api</title>
+  </head>
+  <body>
+    <header>
+      <h1>Moss Admin</h1>
+    </header>
+    <main>
+      <div class="wrap">
+        <div class="list">
+          <div class="card">
+            <h3 class="title">Service Manager</h3>
+            <div class="button-wrap">
+              <button class="m2 elevate">+ Service</button>
+            </div>
+            <div class="content">
+              <table class="basic">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Port</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>F2SS0WEFH7</td>
+                    <td>customer</td>
+                    <td>12010</td>
+                    <td>Running</td>
+                    <td>
+                      <button class="m2" disabled>Start</button>
+                      <button class="m2">Stop</button>
+                      <button class="m2">Remove</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="title">Database Manager</h3>
+            <div class="button-wrap">
+              <button class="m2 elevate">+ Table</button>
+            </div>
+            <div class="content">
+              <table class="basic">
+                <thead>
+                  <tr>
+                    <th>Table name</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>customer</td>
+                    <td>Management customer.</td>
+                    <td>
+                      <button class="m2">Detail</button>
+                      <button class="m2">Edit</button>
+                      <button class="m2">Remove</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>product</td>
+                    <td>Management product.</td>
+                    <td>
+                      <button class="m2">Detail</button>
+                      <button class="m2">Edit</button>
+                      <button class="m2">Remove</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>customer_product</td>
+                    <td>Relation customer and product.</td>
+                    <td>
+                      <button class="m2">Detail</button>
+                      <button class="m2">Edit</button>
+                      <button class="m2">Remove</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail">
+          <div class="form">
+            <h3>Create service</h3>
+            <div class="form-wrap">
+              <div class="input-wrap">
+                <label>Service name</label>
+                <input type="text" placeholder="Input service name" />
+              </div>
+              <div class="input-wrap">
+                <label>Port number</label>
+                <input type="text" placeholder="Input port number" />
+              </div>
+              <div class="input-wrap">
+                <label>Execute file</label>
+                <input type="file" />
+              </div>
+            </div>
+            <div class="submit-wrap">
+              <button class="m3 elevate">Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
