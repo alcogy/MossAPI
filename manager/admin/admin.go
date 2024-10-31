@@ -1,17 +1,32 @@
 package admin
 
 import (
-	"net/http"
+	"manager/admin/handler"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/browser"
 )
 
-func Serve() {
-	http.Handle("/", http.FileServer(http.Dir("admin/public/")))
+func Serve(mysql *sqlx.DB) {
+	e := echo.New()
+	
+	e.Use(middleware.Logger())
+  e.Use(middleware.Recover())
+
+	// Static files.
+	e.Static("/", "admin/public")
+	e.GET("/", handler.GetIndexHtml)
+
+	// API.
+	e.GET("/api/containers", handler.GetAllContainer)
+	e.GET("/api/tables", handler.GetAllTables)
+	
 	go func() {
 		browser.OpenURL("http://localhost:5500")
 	}()
-	if err := http.ListenAndServe(":5500", nil); err != nil {
-		panic(err)
-	}
+
+	e.Logger.Fatal(e.Start(":5500"))
+	
 }

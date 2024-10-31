@@ -112,11 +112,21 @@
               </div>
             </div>
             <div class="submit-wrap">
-              <button class="m3 elevate">Create</button>
+              <button class="m3 elevate" onclick="onClickCreate()">
+                Create
+              </button>
             </div>
           </div>
         </div>
       </div>
     </main>
+    <script>
+      const onClickCreate = async () => {
+        const response = await fetch("http://localhost:5500/api/containers");
+        const json = await response.json();
+        //  const body = await reader.text();
+        console.log(json);
+      };
+    </script>
   </body>
 </html>

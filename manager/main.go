@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"manager/admin"
 	"manager/command"
 	"manager/database/mysql"
 	"manager/model"
@@ -15,6 +16,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer mysql.Close()
+
+	// TODO for debug.
+	admin.Serve(mysql)
+	return
 
 	// Command
 	c := flag.String("c", "", "Command name.")
