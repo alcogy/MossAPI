@@ -66,6 +66,10 @@ table.basic {
 table.basic td {
   padding: 8px;
 }
+table.basic td.fit {
+  width: 1%;
+  white-space: nowrap;
+}
 table.basic th {
   background-color: #e5e5e5;
   text-align: left;

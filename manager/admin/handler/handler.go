@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"manager/admin/container"
-	"manager/admin/table"
+	"manager/admin/models"
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,11 +13,11 @@ func GetIndexHtml(c echo.Context) error {
 }
 
 func GetAllContainer(c echo.Context) error {
-	data := container.GetAllContainers()
+	data := models.GetAllContainers()
 	return c.JSON(http.StatusOK, data)
 }
 
-func GetAllTables(c echo.Context) error {
-	data := table.GetAllTables()
+func GetAllTables(c echo.Context, mysql *sqlx.DB) error {
+	data := models.GetAllTables(mysql)
 	return c.JSON(http.StatusOK, data)
 }

@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -243,4 +244,37 @@ func StopContainer(service string) {
 		}
 	}
 	// exec.Command("cmd", "/c", "docker", "stop", service).Output()
+}
+
+type Container struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Port   string `json:"port"`
+	Status string `json:"status"`
+}
+
+// ----------------------------------------------------
+// Fetch all containers.
+func AllContainers() []Container {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		panic(err)
+	}
+	containers, err := cli.ContainerList(context.Background(), container.ListOptions{ All: true })
+	if err != nil {
+		panic(err)
+	}
+
+	var containerInfos []Container;
+	for _, ctr := range containers {
+		c := Container{
+			ID: ctr.ID[:12],
+			Name: ctr.Names[0],
+			Port: strconv.FormatInt(int64(ctr.Ports[0].PrivatePort), 10),
+			Status: ctr.Status,
+		}
+		containerInfos = append(containerInfos, c);
+	}
+
+	return containerInfos
 }
