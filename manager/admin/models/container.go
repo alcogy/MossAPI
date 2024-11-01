@@ -2,6 +2,7 @@ package models
 
 import (
 	"manager/container"
+	"manager/libs"
 )
 
 func GetAllContainers() []container.Container {
@@ -27,4 +28,12 @@ func GetAllContainers() []container.Container {
 	// 		Status: "Running",
 	// 	},
 	// }
+}
+
+
+func CreateContainer(service string, port string, artifactPath string) {
+	content := container.GenerateContent(service, nil)
+	container.GenerateDockerfile(service, content)
+	libs.CopyFileTree(artifactPath, container.GetServiceDir(service))
+	container.BuildAndRun(service, port)
 }

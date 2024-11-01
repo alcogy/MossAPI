@@ -118,10 +118,22 @@
     </main>
     <script>
       const onClickCreate = async () => {
-        const response = await fetch("http://localhost:5500/api/containers");
-        const json = await response.json();
-        //  const body = await reader.text();
-        console.log(json);
+        // const response = await fetch("http://localhost:5500/api/containers");
+        // const json = await response.json();
+        // //  const body = await reader.text();
+        // console.log(json);
+        await fetch("http://localhost:5500/api/container", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            service: "customer",
+            port: "12090",
+            artifact:
+              "C:\\Users\\info\\Dev\\modular-synthesis-api\\samples\\app\\output",
+          }),
+        });
       };
     </script>
   </body>
