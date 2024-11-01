@@ -20,8 +20,8 @@ func Serve(mysql *sqlx.DB) {
 	e.GET("/", handler.GetIndexHtml)
 
 	// API.
-	e.GET("/api/containers", handler.GetAllContainers)
-	e.POST("/api/container", handler.PostContainer)
+	e.GET("/api/services", handler.GetAllServices)
+	e.POST("/api/service", handler.PostService)
 	e.GET("/api/tables", func (c echo.Context) error {
 		return handler.GetAllTables(c, mysql)
 	})

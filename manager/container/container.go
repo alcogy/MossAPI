@@ -51,6 +51,20 @@ func GenerateDockerfile(service string, content string) {
 }
 
 // ----------------------------------------------------
+// BuildAndRun makes docker image and create conteiner.
+func BuildAndCreate(service string, port string) {
+	ctx := context.Background()
+
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		log.Panic(err)
+	}
+	cli.NegotiateAPIVersion(ctx)
+	build(&ctx, cli, service)
+	createContaier(&ctx, cli, service, port)
+}
+
+// ----------------------------------------------------
 // BuildAndRun makes docker image and run conteiner.
 // Image build with tar style byte data.
 func BuildAndRun(service string, port string) {
@@ -63,7 +77,8 @@ func BuildAndRun(service string, port string) {
 	cli.NegotiateAPIVersion(ctx)
 
 	build(&ctx, cli, service)
-	run(&ctx, cli, service, port)
+	container := createContaier(&ctx, cli, service, port)
+	run(&ctx, cli, container)
 }
 
 func build(ctx *context.Context, cli *client.Client, service string) {
@@ -133,8 +148,8 @@ func makebuildContext(root string) *bytes.Reader {
 	return bytes.NewReader(buf.Bytes())
 }
 
-func run(ctx *context.Context, cli *client.Client, service string, port string) {
-	res, err := cli.ContainerCreate(
+func createContaier(ctx *context.Context, cli *client.Client, service string, port string) container.CreateResponse {
+	container, err := cli.ContainerCreate(
 		*ctx,
 		&container.Config{ Image: service, ExposedPorts: nat.PortSet{"9000/tcp": struct{}{}} },
 		&container.HostConfig{
@@ -153,6 +168,11 @@ func run(ctx *context.Context, cli *client.Client, service string, port string) 
 		panic(err)
 	}
 
+	return container
+}
+
+func run(ctx *context.Context, cli *client.Client, res container.CreateResponse) {
+	
 	if err := cli.ContainerStart(
 		*ctx,
 		res.ID,

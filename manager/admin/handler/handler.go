@@ -22,17 +22,17 @@ func GetIndexHtml(c echo.Context) error {
 	return c.File("admin/public/index.html")
 }
 
-func GetAllContainers(c echo.Context) error {
-	data := models.GetAllContainers()
+func GetAllServices(c echo.Context) error {
+	data := models.GetAllServices()
 	return c.JSON(http.StatusOK, data)
 }
 
-func PostContainer(c echo.Context) error {
+func PostService(c echo.Context) error {
 	arg := new(CreateArgs)
 	if err := c.Bind(arg); err != nil {
 		panic(err)
 	}
-	models.CreateContainer(arg.Service, arg.Port, arg.Artifact)
+	models.CreateService(arg.Service, arg.Port, arg.Artifact)
 	return c.JSON(http.StatusOK, Message{Message: "ok"})
 }
 

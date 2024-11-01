@@ -5,7 +5,7 @@ import (
 	"manager/libs"
 )
 
-func GetAllContainers() []container.Container {
+func GetAllServices() []container.Container {
 
 	containers := container.AllContainers()
 	return containers
@@ -30,10 +30,22 @@ func GetAllContainers() []container.Container {
 	// }
 }
 
-
-func CreateContainer(service string, port string, artifactPath string) {
+func CreateService(service string, port string, artifactPath string) {
 	content := container.GenerateContent(service, nil)
 	container.GenerateDockerfile(service, content)
 	libs.CopyFileTree(artifactPath, container.GetServiceDir(service))
-	container.BuildAndRun(service, port)
+	container.BuildAndCreate(service, port)
+}
+
+
+func Run(service string) {
+	// TODO Run
+}
+
+func Stop(service string) {
+	// TODO Stop
+}
+
+func Remove(service string) {
+	// TODO Remove
 }
