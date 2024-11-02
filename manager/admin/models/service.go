@@ -2,32 +2,13 @@ package models
 
 import (
 	"manager/container"
+	"manager/database/redis"
 	"manager/libs"
 )
 
 func GetAllServices() []container.Container {
-
 	containers := container.AllContainers()
 	return containers
-	// return []container.Container{
-	// 	{
-	// 		ID:     "123456A",
-	// 		Name:   "customer",
-	// 		Port:   "12010",
-	// 		Status: "Running",
-	// 	}, {
-	// 		ID:     "4GREW56",
-	// 		Name:   "product",
-	// 		Port:   "12011",
-	// 		Status: "Running",
-	// 	},
-	// 	{
-	// 		ID:     "TT069F3G",
-	// 		Name:   "project",
-	// 		Port:   "12012",
-	// 		Status: "Running",
-	// 	},
-	// }
 }
 
 func CreateService(service string, port string, artifactPath string) {
@@ -37,15 +18,15 @@ func CreateService(service string, port string, artifactPath string) {
 	container.BuildAndCreate(service, port)
 }
 
-
-func Run(service string) {
-	// TODO Run
+func RunService(containerID string) {
+	container.Run(containerID)
 }
 
-func Stop(service string) {
-	// TODO Stop
+func StopService(containerID string) {
+	container.StopContainer(containerID)
 }
 
-func Remove(service string) {
-	// TODO Remove
+func RemoveService(service string) {
+	container.RemoveContainerAndImage(service)
+	redis.DeleteService(service)
 }

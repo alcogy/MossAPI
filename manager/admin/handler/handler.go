@@ -36,6 +36,24 @@ func PostService(c echo.Context) error {
 	return c.JSON(http.StatusOK, Message{Message: "ok"})
 }
 
+func StartService(c echo.Context) error {
+	id := c.Param("id")
+	models.RunService(id)
+	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+}
+
+func StopService(c echo.Context) error {
+	id := c.Param("id")
+	models.StopService(id)
+	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+}
+
+func RemoveService(c echo.Context) error {
+	service := c.Param("service")
+	models.RemoveService(service)
+	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+}
+
 func GetAllTables(c echo.Context, mysql *sqlx.DB) error {
 	data := models.GetAllTables(mysql)
 	return c.JSON(http.StatusOK, data)

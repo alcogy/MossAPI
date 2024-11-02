@@ -21,7 +21,11 @@ func Serve(mysql *sqlx.DB) {
 
 	// API.
 	e.GET("/api/services", handler.GetAllServices)
-	e.POST("/api/service", handler.PostService)
+	e.POST("/api/service/create", handler.PostService)
+	e.POST("/api/service/start/:id", handler.StartService)
+	e.POST("/api/service/stop/:id", handler.StopService)
+	e.POST("/api/service/remove/:service", handler.RemoveService)
+	
 	e.GET("/api/tables", func (c echo.Context) error {
 		return handler.GetAllTables(c, mysql)
 	})
