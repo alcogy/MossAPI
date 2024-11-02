@@ -24,7 +24,8 @@ func SwitchCommand(flags model.Flags, db *sqlx.DB) {
 		Run(flags)
 
 	case "stop":
-		container.StopContainer(flags.Service)
+		cid := container.GetContainerID(flags.Service)
+		container.StopContainer(cid)
 
 	case "gen":
 		Gen(flags)
