@@ -43,8 +43,8 @@ export default function SearviceList() {
   return (
     <Paper elevation={8} sx={{ padding: "24px" }}>
       <ModuleTitle label="Service Manager" />
-      <Box sx={{ marginBottom: "8px" }}>
-        <Button variant="contained" startIcon={<AddIcon />}>
+      <Box sx={{ marginBottom: 1 }}>
+        <Button variant="contained" startIcon={<AddIcon />} href="/service">
           Service
         </Button>
       </Box>

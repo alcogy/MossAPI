@@ -35,7 +35,7 @@ export default function TableList() {
     <Paper elevation={8} sx={{ padding: "24px" }}>
       <ModuleTitle label="Table Manager" />
       <Box sx={{ marginBottom: "8px" }}>
-        <Button variant="contained" startIcon={<AddIcon />}>
+        <Button variant="contained" startIcon={<AddIcon />} href="/table">
           Table
         </Button>
       </Box>

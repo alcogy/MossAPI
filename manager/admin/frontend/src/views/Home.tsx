@@ -5,20 +5,34 @@ import TableList from "../layouts/TableList";
 import CreateService from "../layouts/CreateService";
 import CreateTable from "../layouts/CreateTable";
 import BlankContent from "../layouts/BlankContent";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <BlankContent />,
+  },
+  {
+    path: "/service/",
+    element: <CreateService />,
+  },
+  {
+    path: "/table",
+    element: <CreateTable />,
+  },
+]);
 
 export default function HomeView() {
   return (
     <>
       <Header />
-      <Box sx={{ display: "flex", gap: "32px", padding: "16px" }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      <Box sx={{ display: "flex", gap: 4, padding: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <SearviceList />
           <TableList />
         </Box>
         <Box sx={{ padding: "16px 0", flex: 1 }}>
-          {/* <BlankContent /> */}
-          <CreateService />
-          {/* <CreateTable /> */}
+          <RouterProvider router={router} />
         </Box>
       </Box>
     </>

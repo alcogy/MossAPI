@@ -13,38 +13,67 @@ import {
   TextField,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
-export interface ColumnInfo {
+export interface ColumnForm {
   name: string;
   type: number;
   pk: boolean;
   index: boolean;
 }
 
-export const initColunInfo = { name: "", type: 0, pk: false, index: false };
-
 export default function CreateTable() {
-  const [columns, setColumns] = useState<ColumnInfo[]>([initColunInfo]);
+  const initColunInfo: ColumnForm = {
+    name: "",
+    type: 10,
+    pk: false,
+    index: false,
+  };
+  const [tableName, setTableName] = useState<string>("");
+  const [columns, setColumns] = useState<ColumnForm[]>([initColunInfo]);
+
+  const updateForm = (index: number, kind: string, value: any) => {
+    const newColumns = [...columns];
+    const newState = newColumns[index];
+    switch (kind) {
+      case "name":
+        newState[kind] = value as string;
+        break;
+      case "type":
+        newState[kind] = value as number;
+        break;
+      case "pk":
+        newState[kind] = value as boolean;
+        break;
+      case "index":
+        newState[kind] = value as boolean;
+        break;
+    }
+
+    setColumns(newColumns);
+  };
+
   const onClickCreate = async () => {
-    // const response = await fetch("http://localhost:5500/api/containers");
-    // const json = await response.json();
-    // //  const body = await reader.text();
-    // console.log(json);
-    await fetch("http://localhost:5500/api/container", {
+    console.log(tableName, columns);
+    return;
+    await fetch("http://localhost:5500/api/table/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        service: "customer",
-        port: "12090",
-        artifact:
-          "C:\\Users\\info\\Dev\\modular-synthesis-api\\samples\\app\\output",
+        table: tableName,
+        columns: columns,
       }),
     });
   };
+
+  useEffect(() => {
+    return () => {
+      setColumns([initColunInfo]);
+    };
+  }, []);
   return (
     <Box>
       <ModuleTitle label="Create Table" />
@@ -59,41 +88,46 @@ export default function CreateTable() {
           label="Table name"
           variant="outlined"
           sx={{ maxWidth: "320px" }}
+          value={tableName}
+          onChange={(e) => setTableName(e.target.value)}
         />
 
         <Box>
           <Box
             sx={{
               display: "flex",
-              gap: 10,
+              gap: 8,
               alignItems: "center",
-              justifyContent: "space-between",
-              maxWidth: "640px",
               marginBottom: 3,
             }}
           >
             <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
               Setting Columns
             </Typography>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setColumns([...columns, initColunInfo])}
-            >
-              Column
-            </Button>
+            <IconButton onClick={() => setColumns([...columns, initColunInfo])}>
+              <AddBoxIcon />
+            </IconButton>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {columns.length === 0 && (
+              <Typography>Please add column...</Typography>
+            )}
             {columns.map((value, index) => (
               <Box sx={{ display: "flex", gap: 1 }} key={index}>
-                <TextField label="Column name" variant="outlined" />
+                <TextField
+                  label="Column name"
+                  variant="outlined"
+                  value={value.name}
+                  onChange={(e) => updateForm(index, "name", e.target.value)}
+                />
                 <FormControl sx={{ minWidth: "128px" }}>
                   <InputLabel id="select-label">Column Type</InputLabel>
                   <Select
                     label="Column Type"
                     labelId="select-label"
                     defaultValue={10}
-                    onChange={(e) => console.log(e)}
+                    value={value.type}
+                    onChange={(e) => updateForm(index, "type", e.target.value)}
                   >
                     <MenuItem value={10}>int</MenuItem>
                     <MenuItem value={11}>tinyint</MenuItem>
@@ -104,8 +138,28 @@ export default function CreateTable() {
                     <MenuItem value={32}>datetime</MenuItem>
                   </Select>
                 </FormControl>
-                <FormControlLabel control={<Checkbox />} label="Primary key" />
-                <FormControlLabel control={<Checkbox />} label="Index" />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={value.pk}
+                      onChange={(e) =>
+                        updateForm(index, "pk", e.target.checked)
+                      }
+                    />
+                  }
+                  label="Primary key"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={value.index}
+                      onChange={(e) =>
+                        updateForm(index, "index", e.target.checked)
+                      }
+                    />
+                  }
+                  label="Index"
+                />
                 <Box
                   sx={{
                     flex: 1,
@@ -128,8 +182,10 @@ export default function CreateTable() {
         </Box>
 
         <Box sx={{ marginTop: 4, display: "flex", gap: 2 }}>
-          <Button variant="contained">Create</Button>
-          <Button variant="outlined" color="secondary">
+          <Button variant="contained" onClick={onClickCreate}>
+            Create
+          </Button>
+          <Button variant="outlined" color="secondary" href="/">
             Cancel
           </Button>
         </Box>

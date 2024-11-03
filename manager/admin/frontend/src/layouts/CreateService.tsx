@@ -2,23 +2,34 @@ import ModuleTitle from "../components/ModuleTitle";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { TextField } from "@mui/material";
+import { useState } from "react";
+
+interface ServiceForm {
+  name: string;
+  port: string;
+  artifact: string;
+}
+
+const initServiceForm = {
+  name: "",
+  port: "",
+  artifact: "",
+};
 
 export default function CreateService() {
+  const [form, setForm] = useState<ServiceForm>(initServiceForm);
   const onClickCreate = async () => {
-    // const response = await fetch("http://localhost:5500/api/containers");
-    // const json = await response.json();
-    // //  const body = await reader.text();
-    // console.log(json);
-    await fetch("http://localhost:5500/api/container", {
+    console.log(form);
+    return;
+    await fetch("http://localhost:5500/api/container/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        service: "customer",
-        port: "12090",
-        artifact:
-          "C:\\Users\\info\\Dev\\modular-synthesis-api\\samples\\app\\output",
+        service: form.name,
+        port: form.port,
+        artifact: form.artifact,
       }),
     });
   };
@@ -33,16 +44,33 @@ export default function CreateService() {
           maxWidth: "320px",
         }}
       >
-        <TextField label="Service name" variant="outlined" />
-        <TextField label="Port number" variant="outlined" />
+        <TextField
+          label="Service name"
+          variant="outlined"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+        <TextField
+          label="Port number"
+          variant="outlined"
+          value={form.port}
+          onChange={(e) =>
+            (Number(e.target.value) || e.target.value === "") &&
+            setForm({ ...form, port: e.target.value })
+          }
+        />
         <TextField
           label="Root directory for execute files"
           variant="outlined"
+          value={form.artifact}
+          onChange={(e) => setForm({ ...form, artifact: e.target.value })}
         />
 
         <Box sx={{ marginTop: 3, display: "flex", gap: 2 }}>
-          <Button variant="contained">Create</Button>
-          <Button variant="outlined" color="secondary">
+          <Button variant="contained" onClick={onClickCreate}>
+            Create
+          </Button>
+          <Button variant="outlined" color="secondary" href="/">
             Cancel
           </Button>
         </Box>
