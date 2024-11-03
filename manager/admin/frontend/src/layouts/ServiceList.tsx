@@ -34,6 +34,9 @@ export default function SearviceList() {
       headers: {
         "Content-Type": "application/json",
       },
+    }).catch((e) => {
+      console.error(e);
+      alert("Sorry you got error.");
     });
     // TODO update service list on recoil.
   };
@@ -44,6 +47,9 @@ export default function SearviceList() {
       headers: {
         "Content-Type": "application/json",
       },
+    }).catch((e) => {
+      console.error(e);
+      alert("Sorry you got error.");
     });
     // TODO update service list on recoil.
   };
@@ -54,15 +60,18 @@ export default function SearviceList() {
       headers: {
         "Content-Type": "application/json",
       },
+    }).catch((e) => {
+      console.error(e);
+      alert("Sorry you got error.");
     });
     // TODO update service list on recoil.
   };
 
   return (
-    <Paper elevation={8} sx={{ padding: "24px" }}>
+    <Paper elevation={8} sx={{ padding: 3 }}>
       <ModuleTitle label="Service Manager" />
       <Box sx={{ marginBottom: 1 }}>
-        <Button variant="contained" startIcon={<AddIcon />} href="/service">
+        <Button variant="contained" startIcon={<AddIcon />} href="/#/service">
           Service
         </Button>
       </Box>

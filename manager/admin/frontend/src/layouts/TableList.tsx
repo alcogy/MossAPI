@@ -20,6 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useRecoilValue } from "recoil";
 import { tableListState } from "../state/atoms";
 import { API_TABLE_DELETE } from "../common/constants";
+import { Link } from "react-router-dom";
 
 export default function TableList() {
   const tableList = useRecoilValue(tableListState);
@@ -41,7 +42,7 @@ export default function TableList() {
     <Paper elevation={8} sx={{ padding: "24px" }}>
       <ModuleTitle label="Table Manager" />
       <Box sx={{ marginBottom: "8px" }}>
-        <Button variant="contained" startIcon={<AddIcon />} href="/table">
+        <Button variant="contained" startIcon={<AddIcon />} href="/#/table">
           Table
         </Button>
       </Box>
@@ -65,7 +66,7 @@ export default function TableList() {
                     variant="contained"
                     aria-label="Basic button group"
                   >
-                    <IconButton href={`/table/${value.name}`}>
+                    <IconButton href={`/#/table/${value.name}`}>
                       <ListAltIcon fontSize="small" />
                     </IconButton>
                     <IconButton>

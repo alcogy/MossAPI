@@ -6,3 +6,5 @@
 
 /manager/admin/frontend/node_modules
 /manager/admin/frontend/package-lock.json
+/manager/admin/frontend/build
+/manager/admin/public

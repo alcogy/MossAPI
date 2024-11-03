@@ -5,27 +5,8 @@ import TableList from "../layouts/TableList";
 import CreateService from "../layouts/CreateService";
 import CreateTable from "../layouts/CreateTable";
 import BlankContent from "../layouts/BlankContent";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import TableDetail from "../layouts/TableDetail";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <BlankContent />,
-  },
-  {
-    path: "/service/",
-    element: <CreateService />,
-  },
-  {
-    path: "/table",
-    element: <CreateTable />,
-  },
-  {
-    path: "/table/:table",
-    element: <TableDetail />,
-  },
-]);
 
 export default function HomeView() {
   return (
@@ -37,7 +18,14 @@ export default function HomeView() {
           <TableList />
         </Box>
         <Box sx={{ padding: "16px 0", flex: 1 }}>
-          <RouterProvider router={router} />
+          <HashRouter basename="/">
+            <Routes>
+              <Route path="/" element={<BlankContent />} />
+              <Route path="/service" element={<CreateService />} />
+              <Route path="/table" element={<CreateTable />} />
+              <Route path="/table/:table" element={<TableDetail />} />
+            </Routes>
+          </HashRouter>
         </Box>
       </Box>
     </>
