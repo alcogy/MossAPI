@@ -104,3 +104,12 @@ func ExecuteDDL(db *sqlx.DB, ddl string) {
 		panic(err)
 	}
 }
+
+func DeleteTable(db *sqlx.DB, tb string) error {
+	sql := fmt.Sprintf("drop table %s", tb)
+	_, err := db.Exec(sql)
+	if err != nil {
+		return err
+	}
+	return nil
+}

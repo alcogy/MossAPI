@@ -30,14 +30,16 @@ func Serve(mysql *sqlx.DB) {
 	e.POST("/api/service/create", handler.PostService)
 	e.POST("/api/service/start/:id", handler.StartService)
 	e.POST("/api/service/stop/:id", handler.StopService)
-	e.POST("/api/service/remove/:service", handler.RemoveService)
+	e.DELETE("/api/service/remove/:service", handler.RemoveService)
 	
 	e.GET("/api/tables", func (c echo.Context) error {
 		return handler.GetAllTables(c, mysql)
 	})
-
 	e.GET("/api/table/:table", func (c echo.Context) error {
 		return handler.GetTableDetail(c, mysql)
+	})
+	e.DELETE("/api/table/:table", func (c echo.Context) error {
+		return handler.DeleteTableDetail(c, mysql)
 	})
 	
 	go func() {

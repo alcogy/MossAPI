@@ -28,15 +28,16 @@ export default function TableList() {
   const [tables, setTables] = useState<string[]>([]);
 
   const onClickRemove = async (table: string) => {
-    await fetch(API_TABLE_DELETE + table, {
-      method: "POST",
+    const res = await fetch(API_TABLE_DELETE + table, {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-    }).catch((e) => {
-      console.error(e);
-      alert("Sorry you got error.");
     });
+    const json = await res.json();
+    if (json["message"] === "ok") {
+      setTables(tables.filter((v) => v !== table));
+    }
     // TODO update table list on recoil.
   };
 

@@ -26,3 +26,7 @@ func GetAllTables(db *sqlx.DB) []string {
 func GetTableDetail(db *sqlx.DB, table string) mysql.Table {
 	return mysql.FetchTableDetail(db, table)
 }
+
+func DeleteTableDetail(db *sqlx.DB, table string) error {
+	return mysql.DeleteTable(db, table)
+}

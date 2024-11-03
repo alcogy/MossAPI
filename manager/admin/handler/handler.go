@@ -64,3 +64,13 @@ func GetTableDetail(c echo.Context, mysql *sqlx.DB) error {
 	data := models.GetTableDetail(mysql, table)
 	return c.JSON(http.StatusOK, data)
 }
+
+func DeleteTableDetail(c echo.Context, mysql *sqlx.DB) error {
+	table := c.Param("table")	
+	err := models.DeleteTableDetail(mysql, table)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Message{ Message: err.Error() })
+	}
+
+	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+}

@@ -45,10 +45,14 @@ export default function TableDetail() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>Column</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Type</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Not Null</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Key</TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "40%" }}>
+                Column
+              </TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "30%" }}>Type</TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "20%" }}>
+                Not Null
+              </TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "10%" }}>Key</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
