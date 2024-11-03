@@ -1,5 +1,13 @@
 export interface Table {
   name: string;
+  columns?: Column[];
+}
+
+export interface Column {
+  name: string;
+  type: string;
+  pk: boolean;
+  index: boolean;
 }
 
 export interface Service {
@@ -15,6 +23,36 @@ export const dmTableList: Table[] = [
   { name: "phase" },
   { name: "history" },
 ];
+
+export const dbTableDetail: Table = {
+  name: "customer",
+  columns: [
+    {
+      name: "id",
+      type: "int",
+      pk: true,
+      index: false,
+    },
+    {
+      name: "name",
+      type: "varchar(255)",
+      pk: false,
+      index: false,
+    },
+    {
+      name: "area_id",
+      type: "int",
+      pk: false,
+      index: true,
+    },
+    {
+      name: "created_at",
+      type: "datetime",
+      pk: false,
+      index: false,
+    },
+  ],
+};
 
 export const dmServiceList: Service[] = [
   {

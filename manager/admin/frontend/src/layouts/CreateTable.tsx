@@ -15,6 +15,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import { API_TABLE_CREATE } from "../common/constants";
 
 export interface ColumnForm {
   name: string;
@@ -55,9 +56,7 @@ export default function CreateTable() {
   };
 
   const onClickCreate = async () => {
-    console.log(tableName, columns);
-    return;
-    await fetch("http://localhost:5500/api/table/create", {
+    await fetch(API_TABLE_CREATE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

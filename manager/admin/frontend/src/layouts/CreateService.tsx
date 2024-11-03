@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { TextField } from "@mui/material";
 import { useState } from "react";
+import { API_SERVICE_CREATE } from "../common/constants";
 
 interface ServiceForm {
   name: string;
@@ -19,9 +20,7 @@ const initServiceForm = {
 export default function CreateService() {
   const [form, setForm] = useState<ServiceForm>(initServiceForm);
   const onClickCreate = async () => {
-    console.log(form);
-    return;
-    await fetch("http://localhost:5500/api/container/create", {
+    await fetch(API_SERVICE_CREATE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,6 +32,7 @@ export default function CreateService() {
       }),
     });
   };
+
   return (
     <Box>
       <ModuleTitle label="Create Service" />

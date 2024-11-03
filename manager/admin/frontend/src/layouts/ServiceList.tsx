@@ -19,9 +19,45 @@ import ModuleTitle from "../components/ModuleTitle";
 import AddIcon from "@mui/icons-material/Add";
 import { useRecoilValue } from "recoil";
 import { serviceListState } from "../state/atoms";
+import {
+  API_SERVICE_START,
+  API_SERVICE_STOP,
+  API_SERVICE_REMOVE,
+} from "../common/constants";
 
 export default function SearviceList() {
   const serviceList = useRecoilValue(serviceListState);
+
+  const onClickStart = async (containerID: string) => {
+    await fetch(API_SERVICE_START + containerID, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // TODO update service list on recoil.
+  };
+
+  const onClickStop = async (containerID: string) => {
+    await fetch(API_SERVICE_STOP + containerID, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // TODO update service list on recoil.
+  };
+
+  const onClickRemove = async (service: string) => {
+    await fetch(API_SERVICE_REMOVE + service, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // TODO update service list on recoil.
+  };
+
   return (
     <Paper elevation={8} sx={{ padding: "24px" }}>
       <ModuleTitle label="Service Manager" />
@@ -55,13 +91,13 @@ export default function SearviceList() {
                     variant="contained"
                     aria-label="Basic button group"
                   >
-                    <IconButton>
+                    <IconButton onClick={() => onClickStart(value.id)}>
                       <PlayArrowIcon fontSize="small" />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={() => onClickStop(value.id)}>
                       <StopIcon fontSize="small" />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={() => onClickRemove(value.name)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </ButtonGroup>

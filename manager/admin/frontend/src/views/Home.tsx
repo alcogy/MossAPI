@@ -6,6 +6,7 @@ import CreateService from "../layouts/CreateService";
 import CreateTable from "../layouts/CreateTable";
 import BlankContent from "../layouts/BlankContent";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import TableDetail from "../layouts/TableDetail";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: "/table",
     element: <CreateTable />,
+  },
+  {
+    path: "/table/:table",
+    element: <TableDetail />,
   },
 ]);
 

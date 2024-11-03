@@ -19,9 +19,24 @@ import ModuleTitle from "../components/ModuleTitle";
 import AddIcon from "@mui/icons-material/Add";
 import { useRecoilValue } from "recoil";
 import { tableListState } from "../state/atoms";
+import { API_TABLE_DELETE } from "../common/constants";
 
 export default function TableList() {
   const tableList = useRecoilValue(tableListState);
+
+  const onClickRemove = async (table: string) => {
+    await fetch(API_TABLE_DELETE + table, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).catch((e) => {
+      console.error(e);
+      alert("Sorry you got error.");
+    });
+    // TODO update table list on recoil.
+  };
+
   return (
     <Paper elevation={8} sx={{ padding: "24px" }}>
       <ModuleTitle label="Table Manager" />
@@ -50,13 +65,13 @@ export default function TableList() {
                     variant="contained"
                     aria-label="Basic button group"
                   >
-                    <IconButton>
+                    <IconButton href={`/table/${value.name}`}>
                       <ListAltIcon fontSize="small" />
                     </IconButton>
                     <IconButton>
                       <EditNoteIcon fontSize="small" />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={() => onClickRemove(value.name)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </ButtonGroup>
