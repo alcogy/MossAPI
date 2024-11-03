@@ -6,10 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Table struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
+
 
 func GetAllTables(db *sqlx.DB) []string {
 	tables := mysql.FetchAllTable(db)
@@ -24,4 +21,8 @@ func GetAllTables(db *sqlx.DB) []string {
 	// 		Description: "Relation customer and product.",
 	// 	},
 	// }
+}
+
+func GetTableDetail(db *sqlx.DB, table string) mysql.Table {
+	return mysql.FetchTableDetail(db, table)
 }

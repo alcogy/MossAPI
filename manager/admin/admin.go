@@ -29,6 +29,10 @@ func Serve(mysql *sqlx.DB) {
 	e.GET("/api/tables", func (c echo.Context) error {
 		return handler.GetAllTables(c, mysql)
 	})
+
+	e.GET("/api/table/:table", func (c echo.Context) error {
+		return handler.GetTableDetail(c, mysql)
+	})
 	
 	go func() {
 		browser.OpenURL("http://localhost:5500")

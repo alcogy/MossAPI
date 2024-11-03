@@ -58,3 +58,9 @@ func GetAllTables(c echo.Context, mysql *sqlx.DB) error {
 	data := models.GetAllTables(mysql)
 	return c.JSON(http.StatusOK, data)
 }
+
+func GetTableDetail(c echo.Context, mysql *sqlx.DB) error {
+	table := c.Param("table")
+	data := models.GetTableDetail(mysql, table)
+	return c.JSON(http.StatusOK, data)
+}

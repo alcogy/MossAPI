@@ -10,6 +10,26 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type Table struct {
+	Name        string `json:"name"`
+	Columns 	[]Column `json:"columns"`
+}
+
+type Column struct {
+	Name 	string `json:"name"`
+	Type 	string `json:"type"`
+	PK 		bool 	 `json:"pk"`
+	Index bool 	 `json:"index"`
+}
+
+type TableInfo struct {
+	Field string `db:"Field"`
+	Type 	string `db:"Type"`
+	Null 	string `db:"Null"`
+	Key 	string `db:"Key"`
+	Default 	string `db:"Default"`
+	Extra 	string `db:"Extra"`
+}
 
 func Connection() (*sqlx.DB, error) {
 	err := godotenv.Load()
@@ -47,6 +67,35 @@ func FetchAllTable(db *sqlx.DB) []string {
 	}
 
 	return tables
+}
+
+func FetchTableDetail(db *sqlx.DB, tb string) Table {
+	sql := fmt.Sprintf("SHOW columns FROM %s", tb)
+	rows, err := db.Query(sql)
+	if err != nil {
+		fmt.Println(err)
+		return Table{}
+	}
+
+	var columns []Column
+	for rows.Next() {
+		var info TableInfo
+		rows.Scan(&info.Field, &info.Type, &info.Null, &info.Key, &info.Default, &info.Extra)
+		col := Column{
+			Name: info.Field,
+			Type: info.Type,
+			PK: info.Key == "PRI",
+			Index: info.Key == "MUL",
+		}
+		columns = append(columns, col)
+	}
+	
+	table := Table{
+		Name: tb,
+		Columns: columns,
+	}
+	
+	return table
 }
 
 func ExecuteDDL(db *sqlx.DB, ddl string) {
