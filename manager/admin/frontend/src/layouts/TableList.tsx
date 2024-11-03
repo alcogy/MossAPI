@@ -17,20 +17,11 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
 import AddIcon from "@mui/icons-material/Add";
-
-const Sample = [
-  {
-    name: "customer",
-  },
-  {
-    name: "project",
-  },
-  {
-    name: "relation",
-  },
-];
+import { useRecoilValue } from "recoil";
+import { tableListState } from "../state/atoms";
 
 export default function TableList() {
+  const tableList = useRecoilValue(tableListState);
   return (
     <Paper elevation={8} sx={{ padding: "24px" }}>
       <ModuleTitle label="Table Manager" />
@@ -51,7 +42,7 @@ export default function TableList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Sample.map((value, index) => (
+            {tableList.map((value, index) => (
               <TableRow key={index}>
                 <TableCell>{value.name}</TableCell>
                 <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>

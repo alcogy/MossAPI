@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import HomeView from "./views/Home";
+import { RecoilRoot } from "recoil";
 
 function App() {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -38,10 +39,12 @@ function App() {
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <HomeView />
-    </ThemeProvider>
+    <RecoilRoot>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <HomeView />
+      </ThemeProvider>
+    </RecoilRoot>
   );
 }
 

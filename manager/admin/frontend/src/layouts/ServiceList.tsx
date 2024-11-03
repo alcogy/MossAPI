@@ -17,29 +17,11 @@ import StopIcon from "@mui/icons-material/Stop";
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
 import AddIcon from "@mui/icons-material/Add";
-
-const Sample = [
-  {
-    id: "slx7gtiurkjd",
-    name: "customer",
-    port: "12001",
-    status: "Running",
-  },
-  {
-    id: "ew89fjfllowh",
-    name: "project",
-    port: "12002",
-    status: "Running",
-  },
-  {
-    id: "ghuty47yh3uy",
-    name: "relation",
-    port: "12003",
-    status: "Stop",
-  },
-];
+import { useRecoilValue } from "recoil";
+import { serviceListState } from "../state/atoms";
 
 export default function SearviceList() {
+  const serviceList = useRecoilValue(serviceListState);
   return (
     <Paper elevation={8} sx={{ padding: "24px" }}>
       <ModuleTitle label="Service Manager" />
@@ -62,7 +44,7 @@ export default function SearviceList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Sample.map((value) => (
+            {serviceList.map((value) => (
               <TableRow key={value.id}>
                 <TableCell>{value.id}</TableCell>
                 <TableCell>{value.name}</TableCell>
