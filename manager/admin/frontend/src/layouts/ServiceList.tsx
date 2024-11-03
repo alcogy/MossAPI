@@ -23,11 +23,14 @@ import {
   API_SERVICE_START,
   API_SERVICE_STOP,
   API_SERVICE_REMOVE,
+  API_GET_SERVICES,
 } from "../common/constants";
+import { useEffect, useState } from "react";
+import { Service } from "../state/models";
 
 export default function SearviceList() {
   const serviceList = useRecoilValue(serviceListState);
-
+  const [services, setServices] = useState<Service[]>();
   const onClickStart = async (containerID: string) => {
     await fetch(API_SERVICE_START + containerID, {
       method: "POST",
@@ -67,6 +70,15 @@ export default function SearviceList() {
     // TODO update service list on recoil.
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(API_GET_SERVICES);
+      const data = await response.json();
+      setServices(data as Service[]);
+    };
+    fetchData().catch((e) => console.error(e));
+  }, []);
+
   return (
     <Paper elevation={8} sx={{ padding: 3 }}>
       <ModuleTitle label="Service Manager" />
@@ -89,7 +101,7 @@ export default function SearviceList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {serviceList.map((value) => (
+            {services?.map((value) => (
               <TableRow key={value.id}>
                 <TableCell>{value.id}</TableCell>
                 <TableCell>{value.name}</TableCell>

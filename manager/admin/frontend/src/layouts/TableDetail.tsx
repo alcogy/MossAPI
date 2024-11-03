@@ -12,12 +12,12 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
-import { Column, dbTableDetail, Table as TableModel } from "../state/models";
+import { Column, Table as TableModel } from "../state/models";
 import { useParams } from "react-router-dom";
 import { API_GET_TABLE_DETAIL } from "../common/constants";
 
 export default function TableDetail() {
-  const [tableInfo, setTableInfo] = useState<TableModel>(dbTableDetail);
+  const [tableInfo, setTableInfo] = useState<TableModel>();
   const { table } = useParams();
 
   const getKeyLabel = (v: Column): string => {
@@ -33,7 +33,7 @@ export default function TableDetail() {
       setTableInfo(data as TableModel);
     };
     fetchData().catch((e) => console.error(e));
-  }, []);
+  }, [table]);
 
   return (
     <>

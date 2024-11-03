@@ -14,6 +14,12 @@ func Serve(mysql *sqlx.DB) {
 	
 	e.Use(middleware.Logger())
   e.Use(middleware.Recover())
+	// CORS for debub.
+	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{"*"},
+	}))
 
 	// Static files.
 	e.Static("/", "admin/public")

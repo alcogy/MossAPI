@@ -19,11 +19,13 @@ import ModuleTitle from "../components/ModuleTitle";
 import AddIcon from "@mui/icons-material/Add";
 import { useRecoilValue } from "recoil";
 import { tableListState } from "../state/atoms";
-import { API_TABLE_DELETE } from "../common/constants";
+import { API_GET_TABLES, API_TABLE_DELETE } from "../common/constants";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function TableList() {
   const tableList = useRecoilValue(tableListState);
+  const [tables, setTables] = useState<string[]>([]);
 
   const onClickRemove = async (table: string) => {
     await fetch(API_TABLE_DELETE + table, {
@@ -37,6 +39,15 @@ export default function TableList() {
     });
     // TODO update table list on recoil.
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(API_GET_TABLES);
+      const data = await response.json();
+      setTables(data as string[]);
+    };
+    fetchData().catch((e) => console.error(e));
+  }, []);
 
   return (
     <Paper elevation={8} sx={{ padding: "24px" }}>
@@ -58,21 +69,21 @@ export default function TableList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tableList.map((value, index) => (
+            {tables.map((value, index) => (
               <TableRow key={index}>
-                <TableCell>{value.name}</TableCell>
+                <TableCell>{value}</TableCell>
                 <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>
                   <ButtonGroup
                     variant="contained"
                     aria-label="Basic button group"
                   >
-                    <IconButton href={`/#/table/${value.name}`}>
+                    <IconButton href={`/#/table/${value}`}>
                       <ListAltIcon fontSize="small" />
                     </IconButton>
                     <IconButton>
                       <EditNoteIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={() => onClickRemove(value.name)}>
+                    <IconButton onClick={() => onClickRemove(value)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </ButtonGroup>
