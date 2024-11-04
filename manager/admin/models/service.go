@@ -7,8 +7,7 @@ import (
 )
 
 func GetAllServices() []container.Container {
-	containers := container.AllContainers()
-	return containers
+	return container.AllContainers()
 }
 
 func CreateService(service string, port string, artifactPath string) {
