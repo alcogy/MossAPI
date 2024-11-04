@@ -20,7 +20,7 @@ const initServiceForm = {
 export default function CreateService() {
   const [form, setForm] = useState<ServiceForm>(initServiceForm);
   const onClickCreate = async () => {
-    await fetch(API_SERVICE_CREATE, {
+    const result = await fetch(API_SERVICE_CREATE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -31,6 +31,9 @@ export default function CreateService() {
         artifact: form.artifact,
       }),
     });
+
+    console.log(result);
+    setForm(initServiceForm);
   };
 
   return (

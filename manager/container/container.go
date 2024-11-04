@@ -105,11 +105,11 @@ func AllContainers() []Container {
 	for _, ctr := range containers {
 		var port string
 		if len(ctr.Ports) != 0 {
-			port = strconv.FormatInt(int64(ctr.Ports[0].PrivatePort), 10)
+			port = strconv.FormatInt(int64(ctr.Ports[0].PublicPort), 10)
 		}
 		c := Container{
 			ID: ctr.ID[:12],
-			Name: ctr.Names[0],
+			Name: ctr.Names[0][1:],
 			Port: port,
 			Status: ctr.Status,
 		}

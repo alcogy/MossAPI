@@ -12,7 +12,7 @@ type Message struct {
 	Message string `json:"message"`
 }
 
-type CreateArgs struct {
+type CreateServiceBody struct {
 	Service string `json:"service"`
 	Port string `json:"port"`
 	Artifact string `json:"artifact"`
@@ -28,8 +28,8 @@ func GetAllServices(c echo.Context) error {
 }
 
 func PostService(c echo.Context) error {
-	arg := new(CreateArgs)
-	if err := c.Bind(arg); err != nil {
+	var arg CreateServiceBody
+	if err := c.Bind(&arg); err != nil {
 		panic(err)
 	}
 	models.CreateService(arg.Service, arg.Port, arg.Artifact)
