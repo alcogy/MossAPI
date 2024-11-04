@@ -70,27 +70,28 @@ export default function TableList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tables.map((value, index) => (
-              <TableRow key={index}>
-                <TableCell>{value}</TableCell>
-                <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>
-                  <ButtonGroup
-                    variant="contained"
-                    aria-label="Basic button group"
-                  >
-                    <IconButton href={`/#/table/${value}`}>
-                      <ListAltIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton>
-                      <EditNoteIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton onClick={() => onClickRemove(value)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </ButtonGroup>
-                </TableCell>
-              </TableRow>
-            ))}
+            {tables &&
+              tables.map((value, index) => (
+                <TableRow key={index}>
+                  <TableCell>{value}</TableCell>
+                  <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>
+                    <ButtonGroup
+                      variant="contained"
+                      aria-label="Basic button group"
+                    >
+                      <IconButton href={`/#/table/${value}`}>
+                        <ListAltIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton>
+                        <EditNoteIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton onClick={() => onClickRemove(value)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </ButtonGroup>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

@@ -108,7 +108,6 @@ func ExecuteDDL(db *sqlx.DB, ddl string) {
 
 func CreateTable(db *sqlx.DB, tb Table) error {
 	sql := makeCreateTableSql(tb)
-	fmt.Println(sql)
 	_, err := db.Exec(sql)
 	if err != nil {
 		return err
