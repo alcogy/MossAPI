@@ -38,6 +38,9 @@ func Serve(mysql *sqlx.DB) {
 	e.GET("/api/table/:table", func (c echo.Context) error {
 		return handler.GetTableDetail(c, mysql)
 	})
+	e.POST("/api/table", func (c echo.Context) error {
+		return handler.CrateTable(c, mysql)
+	})
 	e.DELETE("/api/table/:table", func (c echo.Context) error {
 		return handler.DeleteTableDetail(c, mysql)
 	})

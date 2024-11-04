@@ -9,22 +9,15 @@ import (
 
 
 func GetAllTables(db *sqlx.DB) []string {
-	tables := mysql.FetchAllTable(db)
-	return tables
-	// return []Table{	
-	// 	{
-	// 		Name:        "product",
-	// 		Description: "Management product.",
-	// 	},
-	// 	{
-	// 		Name:        "customer_product",
-	// 		Description: "Relation customer and product.",
-	// 	},
-	// }
+	return mysql.FetchAllTable(db)
 }
 
 func GetTableDetail(db *sqlx.DB, table string) mysql.Table {
 	return mysql.FetchTableDetail(db, table)
+}
+
+func CreateTable(db *sqlx.DB, table mysql.Table) error {
+	return mysql.CreateTable(db, table)
 }
 
 func DeleteTableDetail(db *sqlx.DB, table string) error {

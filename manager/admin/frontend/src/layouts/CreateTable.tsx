@@ -24,15 +24,37 @@ export interface ColumnForm {
   index: boolean;
 }
 
+const typeList = [
+  { value: 10, label: "int" },
+  { value: 11, label: "tinyint" },
+  { value: 20, label: "varchar(255)" },
+  { value: 23, label: "text" },
+  { value: 30, label: "date" },
+  { value: 31, label: "time" },
+  { value: 32, label: "datetime" },
+];
+
+const initColunInfo: ColumnForm = {
+  name: "",
+  type: 10,
+  pk: false,
+  index: false,
+};
+
 export default function CreateTable() {
-  const initColunInfo: ColumnForm = {
-    name: "",
-    type: 10,
-    pk: false,
-    index: false,
-  };
   const [tableName, setTableName] = useState<string>("");
-  const [columns, setColumns] = useState<ColumnForm[]>([initColunInfo]);
+  const [columns, setColumns] = useState<ColumnForm[]>([{ ...initColunInfo }]);
+
+  const disabled = (): boolean => {
+    if (tableName === "") return true;
+    if (columns.length === 0) return false;
+    for (const col of columns) {
+      if (col.name === "") return true;
+    }
+    // TODO regex only alphabet, num, underscore.
+
+    return false;
+  };
 
   const updateForm = (index: number, kind: string, value: any) => {
     const newColumns = [...columns];
@@ -56,23 +78,41 @@ export default function CreateTable() {
   };
 
   const onClickCreate = async () => {
-    await fetch(API_TABLE_CREATE, {
+    if (!window.confirm("Do you registrate data?")) return;
+    const result = await fetch(API_TABLE_CREATE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        table: tableName,
-        columns: columns,
+        name: tableName,
+        columns: columns.map((v) => {
+          return { ...v, type: getTypeLabel(v.type) };
+        }),
       }),
     });
+    const json = await result.json();
+    if (json["message"] !== "ok") {
+      alert("error occured.");
+      console.error(json["message"]);
+    }
+    setTableName("");
+    setColumns([{ ...initColunInfo }]);
+  };
+
+  const getTypeLabel = (type: number) => {
+    for (const t of typeList) {
+      if (t.value === type) return t.label;
+    }
+    return "";
   };
 
   useEffect(() => {
     return () => {
-      setColumns([initColunInfo]);
+      setColumns([{ ...initColunInfo }]);
     };
   }, []);
+
   return (
     <Box>
       <ModuleTitle label="Create Table" />
@@ -103,7 +143,9 @@ export default function CreateTable() {
             <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
               Setting Columns
             </Typography>
-            <IconButton onClick={() => setColumns([...columns, initColunInfo])}>
+            <IconButton
+              onClick={() => setColumns([...columns, { ...initColunInfo }])}
+            >
               <AddBoxIcon />
             </IconButton>
           </Box>
@@ -119,7 +161,7 @@ export default function CreateTable() {
                   value={value.name}
                   onChange={(e) => updateForm(index, "name", e.target.value)}
                 />
-                <FormControl sx={{ minWidth: "128px" }}>
+                <FormControl sx={{ minWidth: "148px" }}>
                   <InputLabel id="select-label">Column Type</InputLabel>
                   <Select
                     label="Column Type"
@@ -128,13 +170,11 @@ export default function CreateTable() {
                     value={value.type}
                     onChange={(e) => updateForm(index, "type", e.target.value)}
                   >
-                    <MenuItem value={10}>int</MenuItem>
-                    <MenuItem value={11}>tinyint</MenuItem>
-                    <MenuItem value={20}>varchar</MenuItem>
-                    <MenuItem value={23}>text</MenuItem>
-                    <MenuItem value={30}>date</MenuItem>
-                    <MenuItem value={31}>time</MenuItem>
-                    <MenuItem value={32}>datetime</MenuItem>
+                    {typeList.map((v) => (
+                      <MenuItem value={v.value} key={v.value}>
+                        {v.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
                 <FormControlLabel
@@ -181,7 +221,11 @@ export default function CreateTable() {
         </Box>
 
         <Box sx={{ marginTop: 4, display: "flex", gap: 2 }}>
-          <Button variant="contained" onClick={onClickCreate}>
+          <Button
+            variant="contained"
+            onClick={onClickCreate}
+            disabled={disabled()}
+          >
             Create
           </Button>
           <Button variant="outlined" color="secondary" href="/">

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"manager/admin/models"
+	"manager/database/mysql"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -63,6 +64,18 @@ func GetTableDetail(c echo.Context, mysql *sqlx.DB) error {
 	table := c.Param("table")
 	data := models.GetTableDetail(mysql, table)
 	return c.JSON(http.StatusOK, data)
+}
+
+func CrateTable(c echo.Context, db *sqlx.DB) error {
+	var arg mysql.Table
+	if err := c.Bind(&arg); err != nil {
+		panic(err)
+	}
+	err := models.CreateTable(db, arg)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Message{ Message: err.Error() })
+	}
+	return c.JSON(http.StatusOK, Message{ Message: "ok" })
 }
 
 func DeleteTableDetail(c echo.Context, mysql *sqlx.DB) error {

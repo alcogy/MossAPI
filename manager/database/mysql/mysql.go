@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -105,6 +106,16 @@ func ExecuteDDL(db *sqlx.DB, ddl string) {
 	}
 }
 
+func CreateTable(db *sqlx.DB, tb Table) error {
+	sql := makeCreateTableSql(tb)
+	fmt.Println(sql)
+	_, err := db.Exec(sql)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func DeleteTable(db *sqlx.DB, tb string) error {
 	sql := fmt.Sprintf("drop table %s", tb)
 	_, err := db.Exec(sql)
@@ -112,4 +123,36 @@ func DeleteTable(db *sqlx.DB, tb string) error {
 		return err
 	}
 	return nil
+}
+
+func makeCreateTableSql(table Table) string {
+	var sql string
+	var pks []string
+	var indexes []string
+
+	sql += fmt.Sprintf("create table `%s` (\n", table.Name)
+	for _, col := range table.Columns {
+		sql += fmt.Sprintf("  `%s` %s not null,\n", col.Name, col.Type)
+		if col.PK {
+			pks = append(pks, "`" + col.Name + "`")
+		}
+		if col.Index {
+			indexes = append(indexes, col.Name)
+		}
+	}
+	
+	if len(pks) > 0 {
+		sql += fmt.Sprintf("  primary key (%s),\n", strings.Join(pks, ","))
+	}
+
+	if len(indexes) > 0 {
+		for _, v := range indexes {
+			sql += fmt.Sprintf("  index `index_%s` (`%s`),\n", v, v)
+		}
+	}
+
+	sql = sql[:len(sql)-2]
+	sql += "\n);"
+
+	return sql
 }
