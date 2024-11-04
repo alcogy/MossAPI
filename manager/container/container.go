@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"manager/database/redis"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -101,15 +102,22 @@ func AllContainers() []Container {
 		panic(err)
 	}
 
+	services := redis.FetchAllData()
+	
 	var containerInfos []Container;
 	for _, ctr := range containers {
+		name := ctr.Names[0][1:]
+		if !hasService(name, services) {
+			continue
+		}
+		
 		var port string
 		if len(ctr.Ports) != 0 {
 			port = strconv.FormatInt(int64(ctr.Ports[0].PublicPort), 10)
 		}
 		c := Container{
 			ID: ctr.ID[:12],
-			Name: ctr.Names[0][1:],
+			Name: name,
 			Port: port,
 			Status: ctr.Status,
 		}
@@ -349,3 +357,11 @@ func run(ctx *context.Context, cli *client.Client, containerID string) {
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 }
 
+func hasService(name string, services []redis.KeyValue) bool {
+	for _, v := range services {
+		if v.Key == name {
+			return true
+		}
+	}
+	return false
+}
