@@ -59,7 +59,7 @@ export default function SearviceList() {
 
   const onClickRemove = async (service: string) => {
     await fetch(API_SERVICE_REMOVE + service, {
-      method: "POST",
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
