@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/fs"
 	"manager/container"
-	"manager/database/mysql"
 	"manager/database/redis"
 	"manager/model"
 	"os"
@@ -36,9 +35,6 @@ func SwitchCommand(flags model.Flags, db *sqlx.DB) {
 	case "copy":
 		CopyArtifact(flags)
 
-	case "db":
-		DoDB(flags, db)
-	
 	default:
 		message := "Not Found command \"%s\".\n"
 		message += "You can use commands are below.\n"
@@ -155,13 +151,4 @@ func CopyArtifact(flags model.Flags) {
 		}
 		return nil
 	})
-}
-
-// ----------------------------------------
-// Experimental DB actions. TODO: Delete
-func DoDB(flags model.Flags, db *sqlx.DB) {
-	// TODO Implement generate DDL.
-	//mysql.ExecuteDDL(db, "CREATE TABLE `gett` (`id` int not null, `name` varchar(255) not null);")
-	tables := mysql.FetchAllTable(db)
-	fmt.Printf("%v", tables)
 }

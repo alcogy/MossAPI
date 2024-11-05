@@ -1,7 +1,6 @@
-package database
+package redis
 
 import (
-	"manager/database/redis"
 	"os"
 	"testing"
 )
@@ -24,7 +23,7 @@ func TestFetchAllData(t *testing.T) {
 		"project": "12060",
 	}
 
-	kvs := redis.FetchAllData()
+	kvs := FetchAllData()
 	want := 4
 	if len(kvs) != want {
 		t.Fatalf("expected: %v, got: %v\n%v", want, len(kvs), kvs)
@@ -40,11 +39,11 @@ func TestFetchAllData(t *testing.T) {
 func TestCheckExistService(t *testing.T) {
 	beforeAll(t)
 
-	if !redis.CheckExistService("customer") {
+	if !CheckExistService("customer") {
 		t.Fatalf("%v is exist.", "customer")
 	}
 
-	if redis.CheckExistService("abc") {
+	if CheckExistService("abc") {
 		t.Fatalf("%v is not exist.", "abc")
 	}
 }
@@ -52,11 +51,11 @@ func TestCheckExistService(t *testing.T) {
 func TestCheckPortNumberFree(t *testing.T) {
 	beforeAll(t)
 
-	if redis.CheckPortNumberFree("12050") {
+	if CheckPortNumberFree("12050") {
 		t.Fatalf("%v is not free.", "12050")
 	}
 
-	if !redis.CheckPortNumberFree("13333") {
+	if !CheckPortNumberFree("13333") {
 		t.Fatalf("%v is free.", "13333")
 	}
 }
@@ -64,12 +63,12 @@ func TestCheckPortNumberFree(t *testing.T) {
 func TestSetService(t *testing.T) {
 	beforeAll(t)
 
-	err := redis.SetService("franc", "12100")
+	err := SetService("franc", "12100")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	kvs := redis.FetchAllData()
+	kvs := FetchAllData()
 	want := 5
 	if len(kvs) != want {
 		t.Fatalf("expected: %v, got: %v\n%v", want, len(kvs), kvs)
@@ -79,12 +78,12 @@ func TestSetService(t *testing.T) {
 func TestDeleteService(t *testing.T) {
 	beforeAll(t)
 	
-	err := redis.DeleteService("jone")
+	err := DeleteService("jone")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	kvs := redis.FetchAllData()
+	kvs := FetchAllData()
 	for _, v := range kvs {
 		if v.Key == "jone" {
 			t.Fatalf("jone is not deleted.")

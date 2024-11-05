@@ -30,7 +30,7 @@ func connection() *redis.Client {
 	})
 }
 
-
+// FetchAllData provides same result to "KEYS *" by Redis-cli.
 func FetchAllData() []KeyValue {
 	db := connection()
 	defer db.Close()
@@ -51,6 +51,7 @@ func FetchAllData() []KeyValue {
 	return kvs
 }
 
+// CheckExistService confirm exsist key.
 func CheckExistService(service string) bool {
 	db := connection()
 	defer db.Close()
@@ -65,6 +66,7 @@ func CheckExistService(service string) bool {
 	return port != ""
 }
 
+// GetPort retrives port number. Same to "GET [service]".
 func GetPort(service string) (string, error) {
 	db := connection()
 	defer db.Close()
@@ -79,6 +81,7 @@ func GetPort(service string) (string, error) {
 	return port, nil
 }
 
+// CheckPortNumberFree confirm using port number in services.
 func CheckPortNumberFree(port string) bool {
 	kvs := FetchAllData()
 	for _, v := range kvs {
@@ -89,6 +92,7 @@ func CheckPortNumberFree(port string) bool {
 	return true
 }
 
+// Registrate service. Same to "SET [service] [port]".
 func SetService(service string, port string) error {
 	db := connection()
 	defer db.Close()
@@ -99,6 +103,7 @@ func SetService(service string, port string) error {
 	return err
 }
 
+// Delete service. Same to "DEL [key]...".
 func DeleteService(service string) error {
 	db := connection()
 	defer db.Close()
