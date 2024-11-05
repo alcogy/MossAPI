@@ -1,6 +1,14 @@
 // Generate Dockerfile Content.
 package container
 
+import (
+	"log"
+	"os"
+	"path/filepath"
+)
+
+// Generate content for Dockerfile.
+// Currently base on debian:12-slim.
 func GenerateContent(service string, optionalRun []string) string {
 	var content string
 
@@ -17,4 +25,29 @@ func GenerateContent(service string, optionalRun []string) string {
 	content += "CMD [\"./" + service + "\"]"
 
 	return content
+}
+
+
+// Generate Dockerfile with content to service directory.
+func GenerateDockerfile(service string, content string) {
+	path := GetServiceDir(service) 
+
+	// Make service directory if not exsist.
+	info, err := os.Stat(path)
+	
+	if err != nil || info == nil || !info.IsDir() {
+		os.Mkdir(path, 0750)
+	}
+	// Create blank docker file.
+	f, err := os.Create(filepath.Join(path, "Dockerfile"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	// Write content.
+	_, err = f.Write([]byte(content))
+	if err != nil {
+		log.Fatal(err)
+	}
 }

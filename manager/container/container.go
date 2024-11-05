@@ -30,17 +30,6 @@ type Container struct {
 	Status string `json:"status"`
 }
 
-// GetServiceDir retrives service directory
-func GetServiceDir(service string) string {
-	base := "../services/" + service
-	path, err := filepath.Abs(base)
-	if (err != nil) {
-		panic(err)
-	}
-	
-	return filepath.ToSlash(path)
-}
-
 // GetContainerID get container ID by service name.
 func GetContainerID(service string) string {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
@@ -63,31 +52,6 @@ func GetContainerID(service string) string {
 	}
 
 	return containerID
-}
-
-// ----------------------------------------------------
-// Generate Dockerfile with content to service directory.
-func GenerateDockerfile(service string, content string) {
-	path := GetServiceDir(service) 
-
-	// Make service directory if not exsist.
-	info, err := os.Stat(path)
-	
-	if err != nil || info == nil || !info.IsDir() {
-		os.Mkdir(path, 0750)
-	}
-	// Create blank docker file.
-	f, err := os.Create(filepath.Join(path, "Dockerfile"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	// Write content.
-	_, err = f.Write([]byte(content))
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 // ----------------------------------------------------
@@ -138,7 +102,7 @@ func Run(conteinerID string) {
 	}
 	cli.NegotiateAPIVersion(ctx)
 
-	run(&ctx, cli, conteinerID)
+	run(ctx, cli, conteinerID)
 }
 
 // ----------------------------------------------------
@@ -151,8 +115,8 @@ func BuildAndCreate(service string, port string) {
 		log.Panic(err)
 	}
 	cli.NegotiateAPIVersion(ctx)
-	build(&ctx, cli, service)
-	createContaier(&ctx, cli, service, port)
+	build(ctx, cli, service)
+	createContaier(ctx, cli, service, port)
 }
 
 // BuildAndRun makes docker image and run conteiner.
@@ -166,9 +130,9 @@ func BuildAndRun(service string, port string) {
 	}
 	cli.NegotiateAPIVersion(ctx)
 
-	build(&ctx, cli, service)
-	container := createContaier(&ctx, cli, service, port)
-	run(&ctx, cli, container.ID)
+	build(ctx, cli, service)
+	container := createContaier(ctx, cli, service, port)
+	run(ctx, cli, container.ID)
 }
 
 // Just stop container.
@@ -238,17 +202,16 @@ func RemoveContainerAndImage(service string) {
 	fmt.Println("Remove container and image.")
 }
 
-
-
-func build(ctx *context.Context, cli *client.Client, service string) {
+func build(ctx context.Context, cli *client.Client, service string) {
 	path := GetServiceDir(service)
 	
 	res, err := cli.ImageBuild(
-		*ctx,
+		ctx,
 		makebuildContext(path),
 		types.ImageBuildOptions{
-			Dockerfile: "Dockerfile",
-			Tags:       []string{service},
+			NoCache: true,
+			Remove: true,
+			Tags:    []string{service},
 		},
 	)
 	if err != nil {
@@ -267,7 +230,8 @@ func makebuildContext(root string) *bytes.Reader {
 	defer tw.Close()
 
 	if err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
-		
+		fmt.Println(path)
+
 		if err != nil {
 			return err
 		}
@@ -294,10 +258,16 @@ func makebuildContext(root string) *bytes.Reader {
 			return err
 		}
 
-		// Write body data.
-		if _, err := io.Copy(tw, f); err != nil {
-			return err
+		body, err := io.ReadAll(f)
+		if err != nil {
+			panic(err)
 		}
+
+		tw.Write(body)
+		// Write body data.
+		// if _, err := io.Copy(tw, f); err != nil {
+		// 	return err
+		// }
 		
 		return nil
 	}); err != nil {
@@ -307,9 +277,9 @@ func makebuildContext(root string) *bytes.Reader {
 	return bytes.NewReader(buf.Bytes())
 }
 
-func createContaier(ctx *context.Context, cli *client.Client, service string, port string) container.CreateResponse {
+func createContaier(ctx context.Context, cli *client.Client, service string, port string) container.CreateResponse {
 	container, err := cli.ContainerCreate(
-		*ctx,
+		ctx,
 		&container.Config{ Image: service, ExposedPorts: nat.PortSet{"9000/tcp": struct{}{}} },
 		&container.HostConfig{
 			PortBindings: nat.PortMap{nat.Port("9000/tcp"): []nat.PortBinding{
@@ -330,17 +300,17 @@ func createContaier(ctx *context.Context, cli *client.Client, service string, po
 	return container
 }
 
-func run(ctx *context.Context, cli *client.Client, containerID string) {
+func run(ctx context.Context, cli *client.Client, containerID string) {
 	
 	if err := cli.ContainerStart(
-		*ctx,
+		ctx,
 		containerID,
 		container.StartOptions{},
 	); err != nil {
 		panic(err)
 	}
 
-	statusCh, errCh := cli.ContainerWait(*ctx, containerID, container.WaitConditionNotRunning)
+	statusCh, errCh := cli.ContainerWait(ctx, containerID, container.WaitConditionNotRunning)
 	select {
 	case err := <-errCh:
 		if err != nil {
@@ -349,7 +319,7 @@ func run(ctx *context.Context, cli *client.Client, containerID string) {
 	case <-statusCh:
 	}
 
-	out, err := cli.ContainerLogs(*ctx, containerID, container.LogsOptions{ShowStdout: true})
+	out, err := cli.ContainerLogs(ctx, containerID, container.LogsOptions{ShowStdout: true})
 	if err != nil {
 		panic(err)
 	}
