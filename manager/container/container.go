@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"log"
 	"manager/database/redis"
+	"manager/model"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -18,6 +19,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
@@ -107,7 +109,7 @@ func Run(conteinerID string) {
 
 // ----------------------------------------------------
 // BuildAndRun makes docker image and create conteiner.
-func BuildAndCreate(service string, port string) {
+func BuildAndCreate(service string) {
 	ctx := context.Background()
 
 	cli, err := client.NewClientWithOpts(client.FromEnv)
@@ -116,7 +118,7 @@ func BuildAndCreate(service string, port string) {
 	}
 	cli.NegotiateAPIVersion(ctx)
 	build(ctx, cli, service)
-	createContaier(ctx, cli, service, port)
+	createContaier(ctx, cli, service)
 }
 
 // BuildAndRun makes docker image and run conteiner.
@@ -131,7 +133,7 @@ func BuildAndRun(service string, port string) {
 	cli.NegotiateAPIVersion(ctx)
 
 	build(ctx, cli, service)
-	container := createContaier(ctx, cli, service, port)
+	container := createContaier(ctx, cli, service)
 	run(ctx, cli, container.ID)
 }
 
@@ -277,18 +279,11 @@ func makebuildContext(root string) *bytes.Reader {
 	return bytes.NewReader(buf.Bytes())
 }
 
-func createContaier(ctx context.Context, cli *client.Client, service string, port string) container.CreateResponse {
+func createContaier(ctx context.Context, cli *client.Client, service string) container.CreateResponse {
 	container, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{ Image: service, ExposedPorts: nat.PortSet{"9000/tcp": struct{}{}} },
-		&container.HostConfig{
-			PortBindings: nat.PortMap{nat.Port("9000/tcp"): []nat.PortBinding{
-				{
-					HostIP: "0.0.0.0",
-					HostPort: port,
-				},
-			}},
-		},
+		&container.HostConfig{},
 		nil,
 		nil,
 		service,
@@ -296,6 +291,8 @@ func createContaier(ctx context.Context, cli *client.Client, service string, por
 	if err != nil {
 		panic(err)
 	}
+
+	cli.NetworkConnect(ctx, model.PrivateNetworkName, container.ID, &network.EndpointSettings{})
 
 	return container
 }

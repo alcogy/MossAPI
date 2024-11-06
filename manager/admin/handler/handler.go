@@ -2,22 +2,13 @@ package handler
 
 import (
 	"manager/admin/models"
+	"manager/admin/types"
 	"manager/database/mysql"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
-
-type Message struct {
-	Message string `json:"message"`
-}
-
-type CreateServiceBody struct {
-	Service string `json:"service"`
-	Port string `json:"port"`
-	Artifact string `json:"artifact"`
-}
 
 func GetIndexHtml(c echo.Context) error {
 	return c.File("admin/public/index.html")
@@ -29,30 +20,30 @@ func GetAllServices(c echo.Context) error {
 }
 
 func PostService(c echo.Context) error {
-	var arg CreateServiceBody
+	var arg types.CreateServiceBody
 	if err := c.Bind(&arg); err != nil {
 		panic(err)
 	}
-	models.CreateService(arg.Service, arg.Port, arg.Artifact)
-	return c.JSON(http.StatusOK, Message{Message: "ok"})
+	models.CreateService(arg)
+	return c.JSON(http.StatusOK, types.Message{Message: "ok"})
 }
 
 func StartService(c echo.Context) error {
 	id := c.Param("id")
 	models.RunService(id)
-	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+	return c.JSON(http.StatusOK, types.Message{ Message: "ok" })
 }
 
 func StopService(c echo.Context) error {
 	id := c.Param("id")
 	models.StopService(id)
-	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+	return c.JSON(http.StatusOK, types.Message{ Message: "ok" })
 }
 
 func RemoveService(c echo.Context) error {
 	service := c.Param("service")
 	models.RemoveService(service)
-	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+	return c.JSON(http.StatusOK, types.Message{ Message: "ok" })
 }
 
 func GetAllTables(c echo.Context, mysql *sqlx.DB) error {
@@ -73,17 +64,17 @@ func CrateTable(c echo.Context, db *sqlx.DB) error {
 	}
 	err := models.CreateTable(db, arg)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Message{ Message: err.Error() })
+		return c.JSON(http.StatusInternalServerError, types.Message{ Message: err.Error() })
 	}
-	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+	return c.JSON(http.StatusOK, types.Message{ Message: "ok" })
 }
 
 func DeleteTableDetail(c echo.Context, mysql *sqlx.DB) error {
 	table := c.Param("table")	
 	err := models.DeleteTableDetail(mysql, table)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Message{ Message: err.Error() })
+		return c.JSON(http.StatusInternalServerError, types.Message{ Message: err.Error() })
 	}
 
-	return c.JSON(http.StatusOK, Message{ Message: "ok" })
+	return c.JSON(http.StatusOK, types.Message{ Message: "ok" })
 }

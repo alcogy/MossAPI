@@ -93,7 +93,6 @@ export default function SearviceList() {
             <TableRow>
               <TableCell sx={{ fontWeight: 700 }}>ID</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Name</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Port</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
               <TableCell sx={{ fontWeight: 700 }} align="center">
                 Action
@@ -105,7 +104,6 @@ export default function SearviceList() {
               <TableRow key={value.id}>
                 <TableCell>{value.id}</TableCell>
                 <TableCell>{value.name}</TableCell>
-                <TableCell>{value.port}</TableCell>
                 <TableCell>{value.status}</TableCell>
                 <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>
                   <ButtonGroup

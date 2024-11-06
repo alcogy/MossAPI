@@ -7,14 +7,16 @@ import { API_SERVICE_CREATE } from "../common/constants";
 
 interface ServiceForm {
   name: string;
-  port: string;
   artifact: string;
+  options: string;
+  command: string;
 }
 
 const initServiceForm = {
   name: "",
-  port: "",
   artifact: "",
+  options: "",
+  command: "",
 };
 
 export default function CreateService() {
@@ -27,8 +29,9 @@ export default function CreateService() {
       },
       body: JSON.stringify({
         service: form.name,
-        port: form.port,
         artifact: form.artifact,
+        options: form.options,
+        command: form.command,
       }),
     });
 
@@ -44,7 +47,7 @@ export default function CreateService() {
           display: "flex",
           flexDirection: "column",
           gap: 3,
-          maxWidth: "320px",
+          maxWidth: "480px",
         }}
       >
         <TextField
@@ -54,19 +57,24 @@ export default function CreateService() {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
         <TextField
-          label="Port number"
-          variant="outlined"
-          value={form.port}
-          onChange={(e) =>
-            (Number(e.target.value) || e.target.value === "") &&
-            setForm({ ...form, port: e.target.value })
-          }
-        />
-        <TextField
-          label="Root directory for execute files"
+          label="Root directory for artifact"
           variant="outlined"
           value={form.artifact}
           onChange={(e) => setForm({ ...form, artifact: e.target.value })}
+        />
+        <TextField
+          label="Optional Dockerfile Commands."
+          variant="outlined"
+          multiline
+          rows={6}
+          value={form.options}
+          onChange={(e) => setForm({ ...form, options: e.target.value })}
+        />
+        <TextField
+          label="Command when start contaier."
+          variant="outlined"
+          value={form.command}
+          onChange={(e) => setForm({ ...form, command: e.target.value })}
         />
 
         <Box sx={{ marginTop: 3, display: "flex", gap: 2 }}>

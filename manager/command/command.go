@@ -102,8 +102,8 @@ func Gen(flags model.Flags) {
 	}
 
 	// Make Dockerfile with content.
-	content := container.GenerateContent(flags.Service, nil)
-	container.GenerateDockerfile(flags.Service, content)
+	// content := container.GenerateContent(flags.Service, nil)
+	// container.GenerateDockerfile(flags.Service, content)
 }
 
 // ----------------------------------------

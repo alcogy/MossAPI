@@ -1,6 +1,7 @@
 package models
 
 import (
+	"manager/admin/types"
 	"manager/container"
 	"manager/database/redis"
 	"manager/libs"
@@ -10,11 +11,11 @@ func GetAllServices() []container.Container {
 	return container.AllContainers()
 }
 
-func CreateService(service string, port string, artifactPath string) {
-	content := container.GenerateContent(service, nil)
-	container.GenerateDockerfile(service, content)
-	libs.CopyFileTree(artifactPath, container.GetServiceDir(service))
-	container.BuildAndCreate(service, port)
+func CreateService(body types.CreateServiceBody) {
+	content := container.GenerateContent(body)
+	container.GenerateDockerfile(body.Service, content)
+	libs.CopyFileTree(body.Artifact, container.GetServiceDir(body.Service))
+	container.BuildAndCreate(body.Service)
 }
 
 func RunService(containerID string) {

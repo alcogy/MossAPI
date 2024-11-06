@@ -2,30 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/redis/go-redis/v9"
 )
-
-func getClient() *redis.Client {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	return redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_HOST"),
-		Password: os.Getenv("REDIS_PASSWORD"),
-		DB:       0,
-		Protocol: 2,
-	})
-}
 
 func GetServiceURL(service string) string {
 	url := "http://" + service + ":9000/"

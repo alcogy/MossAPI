@@ -57,7 +57,7 @@ func TestBuildAndCreate(t *testing.T) {
 	service := "buildtest"
 	content := "FROM httpd\nRUN echo 'so'\nRUN echo 'some'\nRUN echo 'Hello'"
 	GenerateDockerfile(service, content)
-	BuildAndCreate(service, "11111")
+	BuildAndCreate(service)
 
 	// ctx := context.Background()
 

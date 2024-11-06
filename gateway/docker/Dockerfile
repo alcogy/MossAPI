@@ -1,7 +1,6 @@
-FROM ubuntu:22.04
+FROM debian:12-slim
 
 RUN apt update && apt upgrade -y
-RUN apt install -y golang-go
 
 WORKDIR /app
 EXPOSE 9000

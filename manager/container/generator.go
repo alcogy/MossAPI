@@ -3,26 +3,31 @@ package container
 
 import (
 	"log"
+	"manager/admin/types"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Generate content for Dockerfile.
 // Currently base on debian:12-slim.
-func GenerateContent(service string, optionalRun []string) string {
+func GenerateContent(body types.CreateServiceBody) string {
 	var content string
+	commands :=strings.Split(body.Command, " ")
 
 	// TODO make template file.
 	content += "FROM debian:12-slim\n\n"
 	content += "RUN apt update && apt upgrade -y\n"
-	for _, run := range optionalRun {
-		content += "RUN " + run + "\n"
-	}
+	content += body.Options
 	content += "\n"
 	content += "WORKDIR /app\n"
 	content += "EXPOSE 9000\n"
 	content += "COPY . .\n\n"
-	content += "CMD [\"./" + service + "\"]"
+	content += "CMD ["
+	for _, command := range commands {
+		content += "\"" + command + "\""
+	}
+	content += "]"
 
 	return content
 }
