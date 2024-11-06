@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -29,14 +28,7 @@ func getClient() *redis.Client {
 }
 
 func GetServiceURL(service string) string {
-	db := getClient()
-	ctx := context.Background()
-
-	port, err := db.Get(ctx, service).Result()
-	if err != nil {
-		panic(err)
-	}
-	url := "http://host.docker.internal:" + port
+	url := "http://" + service + ":9000/"
 	fmt.Println(url)
 	return url
 }
