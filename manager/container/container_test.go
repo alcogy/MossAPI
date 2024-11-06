@@ -29,7 +29,7 @@ func TestGetContainerID(t *testing.T) {
 func TestAllContainers(t *testing.T) {
 	beforeAll(t)
 
-	containers := AllContainers()
+	containers := FetchAllServices()
 	if len(containers) == 0 {
 		t.Fatal("Container not found.")
 	}
@@ -43,7 +43,7 @@ func TestRemove(t *testing.T) {
 	cid := "763ad7604424"
 	Remove(cid)
 
-	containers := AllContainers()
+	containers := FetchAllServices()
 	for _, v := range containers {
 		if v.ID[:12] == cid {
 			t.Fatal("Container is not deleted.")

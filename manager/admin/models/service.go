@@ -8,7 +8,7 @@ import (
 )
 
 func GetAllServices() []container.Container {
-	return container.AllContainers()
+	return container.FetchAllServices()
 }
 
 func CreateService(body types.CreateServiceBody) {
