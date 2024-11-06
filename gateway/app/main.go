@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -27,15 +28,16 @@ func getClient() *redis.Client {
 	})
 }
 
-func GetModuleURL(service string) string {
+func GetServiceURL(service string) string {
 	db := getClient()
 	ctx := context.Background()
 
-	url, err := db.Get(ctx, service).Result()
+	port, err := db.Get(ctx, service).Result()
 	if err != nil {
 		panic(err)
 	}
-
+	url := "http://host.docker.internal:" + port
+	fmt.Println(url)
 	return url
 }
 
@@ -44,16 +46,16 @@ func RunReverseProxy(ctx *gin.Context) {
 	service := ctx.Param("service")
 	// Get service info from db (redis)
 	if service == "" {
-		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": service + " is not found."})
+		ctx.IndentedJSON(http.StatusNotFound, gin.H{"message": "service is not found."})
+		return
 	}
 
-	// Get and confirm service info
-	module := GetModuleURL(service)
-
 	// for URL.
+	module := GetServiceURL(service)
 	remote, err := url.Parse(module)
 	if err != nil {
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": service + " is failed."})
+		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
 	}
 
 	// Make reverce proxy director.
