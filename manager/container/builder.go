@@ -106,13 +106,7 @@ func makebuildContext(root string) *bytes.Reader {
 			return err
 		}
 
-		// body, err := io.ReadAll(f)
-		// if err != nil {
-		// 	panic(err)
-		// }
-
-		// tw.Write(body)
-		// Write body data.
+		// Write(copy) body data.
 		if _, err := io.Copy(tw, f); err != nil {
 			return err
 		}
@@ -126,9 +120,15 @@ func makebuildContext(root string) *bytes.Reader {
 }
 
 func createContaier(ctx context.Context, cli *client.Client, service string) container.CreateResponse {
+	conf := &container.Config{
+		Image: service,
+		ExposedPorts: nat.PortSet{"9000/tcp": struct{}{}},
+		Labels: map[string]string{"group": "service"},
+	}
+
 	container, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{ Image: service, ExposedPorts: nat.PortSet{"9000/tcp": struct{}{}}, Labels: map[string]string{"group": "service"} },
+		conf,
 		&container.HostConfig{},
 		nil,
 		nil,
