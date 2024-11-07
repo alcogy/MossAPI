@@ -13,7 +13,7 @@ import (
 // Currently base on debian:12-slim.
 func GenerateContent(body types.CreateServiceBody) string {
 	var content string
-	commands :=strings.Split(body.Command, " ")
+	executes :=strings.Split(body.Execute, " ")
 
 	// TODO make template file.
 	content += "FROM debian:12-slim\n\n"
@@ -24,7 +24,7 @@ func GenerateContent(body types.CreateServiceBody) string {
 	content += "EXPOSE 9000\n"
 	content += "COPY . .\n\n"
 	content += "CMD ["
-	for _, command := range commands {
+	for _, command := range executes  {
 		content += "\"" + command + "\""
 	}
 	content += "]"

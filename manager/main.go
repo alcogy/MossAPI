@@ -26,10 +26,11 @@ func main() {
 		// Command
 		c := flag.String("c", "", "Command name.")
 		s := flag.String("s", "", "Service name.")
-		p := flag.String("p", "", "Port number for connection.")
 		a := flag.String("a", "", "Artifact directory path.")
+		e := flag.String("e", "", "execute command.")
+
 		flag.Parse()
-		flags := model.Flags{Command: *c, Service: *s, Port: *p, Artifact: *a}
+		flags := model.Flags{Command: *c, Service: *s, Artifact: *a, Execute: *e}
 		
 		command.SwitchCommand(flags, mysql)
 	}

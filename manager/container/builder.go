@@ -36,7 +36,7 @@ func BuildAndCreate(service string) {
 
 // BuildAndRun makes docker image and run conteiner.
 // Image build with tar style byte data.
-func BuildAndRun(service string, port string) {
+func BuildAndRun(service string) {
 	ctx := context.Background()
 
 	cli, err := client.NewClientWithOpts(client.FromEnv)

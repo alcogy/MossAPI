@@ -3,7 +3,6 @@ package models
 import (
 	"manager/admin/types"
 	"manager/container"
-	"manager/database/redis"
 	"manager/libs"
 )
 
@@ -28,5 +27,4 @@ func StopService(containerID string) {
 
 func RemoveService(service string) {
 	container.RemoveContainerAndImage(service)
-	redis.DeleteService(service)
 }

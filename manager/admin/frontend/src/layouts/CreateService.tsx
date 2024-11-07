@@ -9,14 +9,14 @@ interface ServiceForm {
   name: string;
   artifact: string;
   options: string;
-  command: string;
+  execute: string;
 }
 
 const initServiceForm = {
   name: "",
   artifact: "",
   options: "",
-  command: "",
+  execute: "",
 };
 
 export default function CreateService() {
@@ -31,7 +31,7 @@ export default function CreateService() {
         service: form.name,
         artifact: form.artifact,
         options: form.options,
-        command: form.command,
+        execute: form.execute,
       }),
     });
 
@@ -71,10 +71,10 @@ export default function CreateService() {
           onChange={(e) => setForm({ ...form, options: e.target.value })}
         />
         <TextField
-          label="Command when start contaier."
+          label="Execute command when start contaier."
           variant="outlined"
-          value={form.command}
-          onChange={(e) => setForm({ ...form, command: e.target.value })}
+          value={form.execute}
+          onChange={(e) => setForm({ ...form, execute: e.target.value })}
         />
 
         <Box sx={{ marginTop: 3, display: "flex", gap: 2 }}>

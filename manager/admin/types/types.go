@@ -8,5 +8,5 @@ type CreateServiceBody struct {
 	Service  string `json:"service"`
 	Artifact string `json:"artifact"`
 	Options  string `json:"options"`
-	Command  string `json:"command"`
+	Execute  string `json:"execute"`
 }

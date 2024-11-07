@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/fs"
 	"manager/container"
-	"manager/database/redis"
 	"manager/model"
 	"os"
 	"path/filepath"
@@ -16,9 +15,7 @@ import (
 
 func SwitchCommand(flags model.Flags, db *sqlx.DB) {
 	switch flags.Command {
-	case "check":
-		Check(flags)
-
+	
 	case "run":
 		Run(flags)
 
@@ -39,24 +36,12 @@ func SwitchCommand(flags model.Flags, db *sqlx.DB) {
 		message := "Not Found command \"%s\".\n"
 		message += "You can use commands are below.\n"
 		message += "-------------------\n"
-		message += "check   Check exist the service.\n"
 		message += "run     make and run the service.\n"
 		message += "stop    stop the service.\n"
 		message += "gen     generate service and run it.\n"
 		message += "rm    	remove service.\n"
 
 		fmt.Printf(message, flags.Command)
-	}
-}
-
-// ----------------------------------------
-// Check exist service
-func Check(flags model.Flags) {
-	port, err := redis.GetPort(flags.Service)
-	if err != nil || port == "" {
-		fmt.Println("not exists")
-	} else {
-		fmt.Println("exists")
 	}
 }
 
@@ -71,36 +56,13 @@ func Run(flags model.Flags) {
 		return
 	}
 	// Check Exist Service
-	port, err := redis.GetPort(flags.Service)
-	if err != nil && port != "" {
-		fmt.Printf("%v is not exist", flags.Service)
-	} else {
-		// container.BuildAndRun(flags.Service, port)
-		// TODO This line is for dev and debug.
-		container.BuildAndRun(flags.Service, flags.Port)
-	}
+	container.BuildAndRun(flags.Service)
 }
 
 // ----------------------------------------
 // Generate Dockerfile with content. And Run Container.
 func Gen(flags model.Flags) {
-	// Check port number from command args.
-	if flags.Service == "" || flags.Port == "" {
-		fmt.Printf("You must specify service name and port number.")
-		return
-	}
-
-	if !redis.CheckPortNumberFree(flags.Port) {
-		fmt.Printf("%v port is not free.", flags.Port)
-		return
-	}
-
-	// Check exist service
-	if redis.CheckExistService(flags.Service) {
-		fmt.Printf("%v is exist", flags.Service)
-		return
-	}
-
+	
 	// Make Dockerfile with content.
 	// content := container.GenerateContent(flags.Service, nil)
 	// container.GenerateDockerfile(flags.Service, content)
@@ -110,7 +72,7 @@ func Gen(flags model.Flags) {
 // Remove container, docker image and service directory
 func Remove(flags model.Flags) {
 	container.RemoveContainerAndImage(flags.Service)
-	redis.DeleteService(flags.Service)
+
 	// TODO Cooment out for dev and debug.
 	// os.RemoveAll(container.GetServiceDir(flags.Service))
 }
