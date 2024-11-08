@@ -12,15 +12,19 @@ import (
 )
 
 type Table struct {
-	Name        string `json:"name"`
-	Columns 	[]Column `json:"columns"`
+	TableName     string `json:"tableName"`
+	TableDesc     string `json:"tableDesc"`
+	Columns 		[]Column `json:"columns"`
 }
 
 type Column struct {
 	Name 	string `json:"name"`
 	Type 	string `json:"type"`
 	PK 		bool 	 `json:"pk"`
-	Index bool 	 `json:"index"`
+	NotNull bool `json:"notNull"`
+	Unique int 	 `json:"unique"`
+	Index int 	 `json:"index"`
+	Comment string `json:"comment"`
 }
 
 type TableInfo struct {
@@ -86,13 +90,13 @@ func FetchTableDetail(db *sqlx.DB, tb string) Table {
 			Name: info.Field,
 			Type: info.Type,
 			PK: info.Key == "PRI",
-			Index: info.Key == "MUL",
+			Index: 0,
 		}
 		columns = append(columns, col)
 	}
 	
 	table := Table{
-		Name: tb,
+		TableName: tb,
 		Columns: columns,
 	}
 	
@@ -127,16 +131,32 @@ func DeleteTable(db *sqlx.DB, tb string) error {
 func makeCreateTableSql(table Table) string {
 	var sql string
 	var pks []string
-	var indexes []string
+	uniques := make(map[int][]string)
+	indexes := make(map[int][]string)
 
-	sql += fmt.Sprintf("create table `%s` (\n", table.Name)
+	sql += fmt.Sprintf("create table `%s` (\n", table.TableName)
 	for _, col := range table.Columns {
-		sql += fmt.Sprintf("  `%s` %s not null,\n", col.Name, col.Type)
+		var notNull string
+		if col.NotNull {
+			notNull = "not null"
+		} else {
+			notNull = ""
+		}
+
+		sql += fmt.Sprintf("  `%s` %s %s comment '%s',\n", col.Name, col.Type, notNull, col.Comment)
+		// Set PK columns.
 		if col.PK {
 			pks = append(pks, "`" + col.Name + "`")
 		}
-		if col.Index {
-			indexes = append(indexes, col.Name)
+
+		// Set unique columns.
+		if col.Unique > 0 {
+			uniques[col.Unique] = append(uniques[col.Unique], "`" + col.Name + "`")
+		}
+
+		// Set Index columns.
+		if col.Index > 0 {
+			indexes[col.Index] = append(indexes[col.Index], "`" + col.Name + "`")
 		}
 	}
 	
@@ -144,14 +164,18 @@ func makeCreateTableSql(table Table) string {
 		sql += fmt.Sprintf("  primary key (%s),\n", strings.Join(pks, ","))
 	}
 
-	if len(indexes) > 0 {
-		for _, v := range indexes {
-			sql += fmt.Sprintf("  index `index_%s` (`%s`),\n", v, v)
-		}
+	for i, unique := range uniques {
+		col := strings.Join(unique, ",")
+		sql += fmt.Sprintf("  unique key `unique_%s_%d` (%s),\n", table.TableName, i, col)
 	}
 
+	for i, index := range indexes {
+		col := strings.Join(index, ",")
+		sql += fmt.Sprintf("  index `index_%s_%d` (%s),\n", table.TableName, i, col)
+	}
+	
 	sql = sql[:len(sql)-2]
-	sql += "\n);"
+	sql += "\n)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='" + table.TableDesc + "';"
 
 	return sql
 }

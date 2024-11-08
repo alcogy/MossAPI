@@ -1,12 +1,12 @@
 import { atom } from "recoil";
-import { dmServiceList, dmTableList, Service, Table } from "./models";
+import { Service, Table } from "./models";
 
 export const tableListState = atom<Table[]>({
   key: "TableList",
-  default: dmTableList,
+  default: [],
 });
 
 export const serviceListState = atom<Service[]>({
   key: "ServiceList",
-  default: dmServiceList,
+  default: [],
 });

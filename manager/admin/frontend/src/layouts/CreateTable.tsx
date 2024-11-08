@@ -15,35 +15,24 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { API_TABLE_CREATE } from "../common/constants";
+import { API_TABLE_CREATE, segmentList, typeList } from "../common/constants";
+import { Column, ColumnFormParams } from "../state/models";
 
-export interface ColumnForm {
-  name: string;
-  type: number;
-  pk: boolean;
-  index: boolean;
-}
-
-const typeList = [
-  { value: 10, label: "int" },
-  { value: 11, label: "tinyint" },
-  { value: 20, label: "varchar(255)" },
-  { value: 23, label: "text" },
-  { value: 30, label: "date" },
-  { value: 31, label: "time" },
-  { value: 32, label: "datetime" },
-];
-
-const initColunInfo: ColumnForm = {
+export const initColunInfo: Column = {
   name: "",
   type: 10,
+  size: 0,
   pk: false,
-  index: false,
+  notNull: true,
+  unique: 0,
+  index: 0,
+  comment: "",
 };
 
 export default function CreateTable() {
   const [tableName, setTableName] = useState<string>("");
-  const [columns, setColumns] = useState<ColumnForm[]>([{ ...initColunInfo }]);
+  const [tableDesc, setTableDesc] = useState<string>("");
+  const [columns, setColumns] = useState<Column[]>([{ ...initColunInfo }]);
 
   const disabled = (): boolean => {
     if (tableName === "") return true;
@@ -56,24 +45,39 @@ export default function CreateTable() {
     return false;
   };
 
-  const updateForm = (index: number, kind: string, value: any) => {
+  const onClickDeleteRow = (index: number) => {
+    if (!window.confirm("Delete this column?")) return;
+    setColumns(columns.filter((_, i) => i !== index));
+  };
+
+  const updateForm = (index: number, kind: ColumnFormParams, value: any) => {
     const newColumns = [...columns];
     const newState = newColumns[index];
     switch (kind) {
       case "name":
+      case "comment":
         newState[kind] = value as string;
         break;
       case "type":
+      case "index":
+      case "unique":
         newState[kind] = value as number;
         break;
       case "pk":
+        const v = value as boolean;
+        if (v) {
+          newState["notNull"] = true;
+        }
+        newState["pk"] = v;
+        break;
+      case "notNull":
         newState[kind] = value as boolean;
         break;
-      case "index":
-        newState[kind] = value as boolean;
-        break;
+      case "size":
+        const num = Number(value);
+        if (isNaN(num) || num < 0 || num > 255) return;
+        newState[kind] = num;
     }
-
     setColumns(newColumns);
   };
 
@@ -85,9 +89,10 @@ export default function CreateTable() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: tableName,
+        tableName: tableName,
+        tableDesc: tableDesc,
         columns: columns.map((v) => {
-          return { ...v, type: getTypeLabel(v.type) };
+          return { ...v, type: getTypeLabel(v) };
         }),
       }),
     });
@@ -100,8 +105,10 @@ export default function CreateTable() {
     setColumns([{ ...initColunInfo }]);
   };
 
-  const getTypeLabel = (type: number) => {
+  const getTypeLabel = (column: Column) => {
+    const type: number = column.type;
     for (const t of typeList) {
+      if (t.value === 20) return "varchar(" + column.size + ")";
       if (t.value === type) return t.label;
     }
     return "";
@@ -129,6 +136,14 @@ export default function CreateTable() {
           sx={{ maxWidth: "320px" }}
           value={tableName}
           onChange={(e) => setTableName(e.target.value)}
+        />
+
+        <TextField
+          label="Table description"
+          variant="outlined"
+          sx={{ maxWidth: "720px" }}
+          value={tableDesc}
+          onChange={(e) => setTableDesc(e.target.value)}
         />
 
         <Box>
@@ -161,7 +176,7 @@ export default function CreateTable() {
                   value={value.name}
                   onChange={(e) => updateForm(index, "name", e.target.value)}
                 />
-                <FormControl sx={{ minWidth: "148px" }}>
+                <FormControl sx={{ minWidth: "128px" }}>
                   <InputLabel id="select-label">Column Type</InputLabel>
                   <Select
                     label="Column Type"
@@ -177,6 +192,16 @@ export default function CreateTable() {
                     ))}
                   </Select>
                 </FormControl>
+
+                <TextField
+                  label="Size"
+                  variant="outlined"
+                  value={value.size}
+                  sx={{ width: "64px" }}
+                  onChange={(e) => updateForm(index, "size", e.target.value)}
+                  disabled={![20].includes(value.type)}
+                />
+
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -188,17 +213,64 @@ export default function CreateTable() {
                   }
                   label="Primary key"
                 />
+
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={value.index}
+                      checked={value.notNull}
+                      disabled={value.pk}
                       onChange={(e) =>
-                        updateForm(index, "index", e.target.checked)
+                        updateForm(index, "notNull", e.target.checked)
                       }
                     />
                   }
-                  label="Index"
+                  label="Not Null"
                 />
+
+                <FormControl sx={{ minWidth: "88px" }}>
+                  <InputLabel id="unique-label">Unique</InputLabel>
+                  <Select
+                    label="Unique"
+                    labelId="unique-label"
+                    defaultValue={0}
+                    value={value.unique}
+                    onChange={(e) =>
+                      updateForm(index, "unique", e.target.value)
+                    }
+                  >
+                    {segmentList.map((v) => (
+                      <MenuItem value={v.value} key={v.value}>
+                        {v.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl sx={{ minWidth: "88px" }}>
+                  <InputLabel id="index-label">Index</InputLabel>
+                  <Select
+                    label="Index"
+                    labelId="index-label"
+                    defaultValue={0}
+                    value={value.index}
+                    onChange={(e) => updateForm(index, "index", e.target.value)}
+                  >
+                    {segmentList.map((v) => (
+                      <MenuItem value={v.value} key={v.value}>
+                        {v.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label="Remarks"
+                  variant="outlined"
+                  value={value.comment}
+                  sx={{ width: "256px" }}
+                  onChange={(e) => updateForm(index, "comment", e.target.value)}
+                />
+
                 <Box
                   sx={{
                     flex: 1,
@@ -207,11 +279,7 @@ export default function CreateTable() {
                     marginLeft: 3,
                   }}
                 >
-                  <IconButton
-                    onClick={() =>
-                      setColumns(columns.filter((_, i) => i !== index))
-                    }
-                  >
+                  <IconButton onClick={() => onClickDeleteRow(index)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Box>

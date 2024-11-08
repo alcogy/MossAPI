@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -24,33 +25,46 @@ func TestCreateTable(t *testing.T) {
 	defer db.Close()
 	
 	table := Table{
-		Name: "sample_table",
+		TableName: "test1_table",
+		TableDesc: "comment test Hello",
 		Columns: []Column{
 			{
 				Name:  "id",
 				Type:  "int",
 				PK:    true,
-				Index: false,
+				NotNull: true,
+				Index: 0,
+				Unique: 0,
+				Comment: "",
 			},
 			{
 				Name:  "name",
 				Type:  "varchar(255)",
-				PK:    true,
-				Index: false,
+				PK:    false,
+				NotNull: true,
+				Index: 1,
+				Unique: 1,
+				Comment: "mysqltete",
 			},
 			{
 				Name:  "area_id",
 				Type:  "int",
 				PK:    false,
-				Index: true,
+				NotNull: false,
+				Index: 3,
+				Unique: 1,
+				Comment: "flow tere",
 			},
 		},
 	}
+
+	sql := makeCreateTableSql(table)
+	fmt.Println(sql)
 
 	err = CreateTable(db, table)
 	if err != nil {
 		t.Fatal(err)
 	}	
-
-	DeleteTable(db, table.Name)
+	
+	// DeleteTable(db, table.TableName)
 }

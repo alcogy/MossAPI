@@ -40,6 +40,7 @@ export default function TableDetail() {
       <ModuleTitle label="Table Detail" />
       <Box sx={{ marginBottom: 1 }}>
         <Typography variant="h6">{tableInfo?.name}</Typography>
+        <Typography>{tableInfo?.name}</Typography>
       </Box>
       <TableContainer component={Paper}>
         <Table>
