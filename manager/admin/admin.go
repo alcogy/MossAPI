@@ -26,6 +26,10 @@ func Serve(mysql *sqlx.DB) {
 	e.GET("/", handler.GetIndexHtml)
 
 	// API.
+	e.GET("/api/infrastructure", func (c echo.Context) error {
+		return handler.GetInfrastructureInfo(c, mysql)
+	})
+
 	e.GET("/api/services", handler.GetAllServices)
 	e.POST("/api/service/create", handler.PostService)
 	e.POST("/api/service/start/:id", handler.StartService)
@@ -50,5 +54,4 @@ func Serve(mysql *sqlx.DB) {
 	}()
 
 	e.Logger.Fatal(e.Start(":5500"))
-	
 }

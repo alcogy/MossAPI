@@ -10,3 +10,8 @@ type CreateServiceBody struct {
 	Options  string `json:"options"`
 	Execute  string `json:"execute"`
 }
+
+type InfrastructureInfo struct {
+	Gateway  bool `json:"gateway"`
+	Database bool `json:"database"`
+}

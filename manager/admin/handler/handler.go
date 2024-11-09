@@ -14,6 +14,16 @@ func GetIndexHtml(c echo.Context) error {
 	return c.File("admin/public/index.html")
 }
 
+func GetInfrastructureInfo(c echo.Context, mysql *sqlx.DB) error {
+	var infra types.InfrastructureInfo
+	infra.Gateway = models.IsActiveGateway()
+	err := mysql.Ping()
+	if err == nil {
+		infra.Database = true
+	}	
+	return c.JSON(http.StatusOK, infra)
+}
+
 func GetAllServices(c echo.Context) error {
 	data := models.GetAllServices()
 	return c.JSON(http.StatusOK, data)

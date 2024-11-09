@@ -17,6 +17,7 @@ import (
 type Container struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
+	State string `json:"state"`
 	Status string `json:"status"`
 }
 
@@ -24,14 +25,16 @@ type Container struct {
 func GetContainerID(service string) string {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
+		return ""
 	}
 	defer cli.Close()
 	ctx := context.Background()
 
 	containers, err := cli.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
+		return ""
 	}
 
 	var containerID string
@@ -42,6 +45,28 @@ func GetContainerID(service string) string {
 	}
 
 	return containerID
+}
+
+func IsActiveGateway() bool {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		panic(err)
+	}
+	containers, err := cli.ContainerList(context.Background(), container.ListOptions{ All: true })
+	if err != nil {
+		panic(err)
+	}
+	for _, ctr := range containers {
+		name := ctr.Names[0][1:] 
+		if name == "gateway" {
+			if ctr.State == "running" {
+				return true
+			} else {
+				return false
+			}
+		}
+	}
+	return false
 }
 
 // ----------------------------------------------------
@@ -65,6 +90,7 @@ func FetchAllServices() []Container {
 		c := Container{
 			ID: ctr.ID[:12],
 			Name: name,
+			State: ctr.State,
 			Status: ctr.Status,
 		}
 		containerInfos = append(containerInfos, c);

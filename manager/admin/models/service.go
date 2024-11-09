@@ -10,6 +10,10 @@ func GetAllServices() []container.Container {
 	return container.FetchAllServices()
 }
 
+func IsActiveGateway() bool {
+	return container.IsActiveGateway()
+}
+
 func CreateService(body types.CreateServiceBody) {
 	content := container.GenerateContent(body)
 	container.GenerateDockerfile(body.Service, content)

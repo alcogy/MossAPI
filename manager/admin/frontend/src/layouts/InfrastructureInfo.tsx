@@ -11,9 +11,37 @@ import {
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
 import CircleIcon from "@mui/icons-material/Circle";
+import { useEffect, useState } from "react";
+import { API_GET_INFRASTRUCTURE } from "../common/constants";
 
-// TODO only ui.
+export interface Infrastructure {
+  gateway: boolean;
+  database: boolean;
+}
+
 export default function InfrastructureInfo() {
+  const [infra, setInfra] = useState<Infrastructure>({
+    gateway: false,
+    database: false,
+  });
+
+  const getSignalColor = (val: boolean): "success" | "disabled" => {
+    return val ? "success" : "disabled";
+  };
+
+  const getStatusLabel = (val: boolean): string => {
+    return val ? "Running" : "Stop";
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(API_GET_INFRASTRUCTURE);
+      const data = await response.json();
+      setInfra(data as Infrastructure);
+    };
+    fetchData().catch((e) => console.error(e));
+  }, []);
+
   return (
     <Paper elevation={8} sx={{ padding: 3 }}>
       <ModuleTitle label="Infrastructure Info" />
@@ -30,8 +58,13 @@ export default function InfrastructureInfo() {
               <TableCell>Gateway</TableCell>
               <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>
                 <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                  <CircleIcon color="success" fontSize="small" />
-                  <Typography variant="body2">Running</Typography>
+                  <CircleIcon
+                    color={getSignalColor(infra.gateway)}
+                    fontSize="small"
+                  />
+                  <Typography variant="body2">
+                    {getStatusLabel(infra.gateway)}
+                  </Typography>
                 </Box>
               </TableCell>
             </TableRow>
@@ -39,8 +72,13 @@ export default function InfrastructureInfo() {
               <TableCell>MySQL</TableCell>
               <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>
                 <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                  <CircleIcon color="error" fontSize="small" />
-                  <Typography variant="body2">Stop</Typography>
+                  <CircleIcon
+                    color={getSignalColor(infra.database)}
+                    fontSize="small"
+                  />
+                  <Typography variant="body2">
+                    {getStatusLabel(infra.database)}
+                  </Typography>
                 </Box>
               </TableCell>
             </TableRow>

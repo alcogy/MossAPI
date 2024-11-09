@@ -35,7 +35,7 @@ func FetchTableDetail(db *sqlx.DB, tb string) Table {
 	
 	columnsInfo := getColumnInfo(db, tb)
 	indexesInfo := getIndexInfo(db, tb)
-	fmt.Println(indexesInfo)
+
 	var columns []Column
 	for _, c := range columnsInfo {
 		// Basic info.
@@ -55,8 +55,6 @@ func FetchTableDetail(db *sqlx.DB, tb string) Table {
 				kind := keys[0]
 				// index number
 				num := keys[len(keys) - 1]
-				fmt.Println(kind)
-				fmt.Println(num)
 				if kind == "index" {
 					val, err := strconv.Atoi(num)
 					if err != nil {

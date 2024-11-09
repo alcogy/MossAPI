@@ -6,8 +6,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-
-
 func GetAllTables(db *sqlx.DB) []string {
 	return mysql.FetchAllTable(db)
 }

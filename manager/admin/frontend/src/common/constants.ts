@@ -1,6 +1,6 @@
-import { Column } from "../state/models";
-
 const urlRoot = "http://localhost:5500/api/";
+
+export const API_GET_INFRASTRUCTURE = urlRoot + "infrastructure";
 
 export const API_GET_SERVICES = urlRoot + "services";
 export const API_SERVICE_CREATE = urlRoot + "service/create";
