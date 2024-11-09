@@ -20,12 +20,6 @@ export default function TableDetail() {
   const [tableInfo, setTableInfo] = useState<TableModel>();
   const { table } = useParams();
 
-  const getKeyLabel = (v: Column): string => {
-    if (v.pk) return "PRI";
-    if (v.index) return "MUL";
-    return "";
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(API_GET_TABLE_DETAIL + table);
@@ -38,22 +32,29 @@ export default function TableDetail() {
   return (
     <>
       <ModuleTitle label="Table Detail" />
-      <Box sx={{ marginBottom: 1 }}>
-        <Typography variant="h6">{tableInfo?.name}</Typography>
-        <Typography>{tableInfo?.name}</Typography>
+      <Box sx={{ marginBottom: 2 }}>
+        <Typography variant="h5">{tableInfo?.tableName}</Typography>
+        <Typography variant="body2">{tableInfo?.tableDesc}</Typography>
       </Box>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700, width: "40%" }}>
+              <TableCell sx={{ fontWeight: 700, width: "20%" }}>
                 Column
               </TableCell>
-              <TableCell sx={{ fontWeight: 700, width: "30%" }}>Type</TableCell>
-              <TableCell sx={{ fontWeight: 700, width: "20%" }}>
-                Not Null
+              <TableCell sx={{ fontWeight: 700, width: "15%" }}>Type</TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "10%" }}>Null</TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "10%" }}>
+                Unique
               </TableCell>
-              <TableCell sx={{ fontWeight: 700, width: "10%" }}>Key</TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "10%" }}>
+                Index
+              </TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "10%" }}>PK</TableCell>
+              <TableCell sx={{ fontWeight: 700, width: "25%" }}>
+                Remarks
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -61,8 +62,13 @@ export default function TableDetail() {
               <TableRow key={i}>
                 <TableCell>{v.name}</TableCell>
                 <TableCell>{v.type}</TableCell>
-                <TableCell>Yes</TableCell>
-                <TableCell>{getKeyLabel(v)}</TableCell>
+                <TableCell>{v.nullable ? "Yes" : ""}</TableCell>
+                <TableCell>
+                  {v.unique === 0 ? "" : `Yes(${v.unique})`}
+                </TableCell>
+                <TableCell>{v.index === 0 ? "" : `Yes(${v.index})`}</TableCell>
+                <TableCell>{v.pk ? "Yes" : ""}</TableCell>
+                <TableCell>{v.comment}</TableCell>
               </TableRow>
             ))}
           </TableBody>

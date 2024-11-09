@@ -14,7 +14,7 @@ export const initColunInfo: Column = {
   type: 10,
   size: 0,
   pk: false,
-  notNull: true,
+  nullable: false,
   unique: 0,
   index: 0,
   comment: "",
@@ -57,11 +57,11 @@ export default function CreateTable() {
       case "pk":
         const v = value as boolean;
         if (v) {
-          newState["notNull"] = true;
+          newState["nullable"] = false;
         }
         newState["pk"] = v;
         break;
-      case "notNull":
+      case "nullable":
         newState[kind] = value as boolean;
         break;
       case "size":
@@ -97,10 +97,9 @@ export default function CreateTable() {
   };
 
   const getTypeLabel = (column: Column) => {
-    const type: number = column.type;
+    if (column.type === 20) return "varchar(" + column.size + ")";
     for (const t of typeList) {
-      if (t.value === 20) return "varchar(" + column.size + ")";
-      if (t.value === type) return t.label;
+      if (t.value === column.type) return t.label;
     }
     return "";
   };

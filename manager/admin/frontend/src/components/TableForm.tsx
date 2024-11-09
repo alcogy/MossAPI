@@ -1,7 +1,4 @@
-import Typography from "@mui/material/Typography";
-import ModuleTitle from "../components/ModuleTitle";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import {
   Checkbox,
   FormControl,
@@ -76,12 +73,12 @@ export default function TableForm({
       <FormControlLabel
         control={
           <Checkbox
-            checked={value.notNull}
+            checked={value.nullable}
             disabled={value.pk}
-            onChange={(e) => updateForm(index, "notNull", e.target.checked)}
+            onChange={(e) => updateForm(index, "nullable", e.target.checked)}
           />
         }
-        label="Not Null"
+        label="Null"
       />
 
       <FormControl sx={{ minWidth: "88px" }}>

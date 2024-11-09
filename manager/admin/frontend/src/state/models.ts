@@ -1,6 +1,6 @@
 export interface Table {
-  name: string;
-  desc: string;
+  tableName: string;
+  tableDesc: string;
   columns?: Column[];
 }
 
@@ -9,7 +9,7 @@ export interface Column {
   type: number;
   size: number;
   pk: boolean;
-  notNull: boolean;
+  nullable: boolean;
   unique: number;
   index: number;
   comment: string;
@@ -22,7 +22,7 @@ export type ColumnFormParams =
   | "index"
   | "unique"
   | "pk"
-  | "notNull"
+  | "nullable"
   | "size";
 
 export interface Service {
