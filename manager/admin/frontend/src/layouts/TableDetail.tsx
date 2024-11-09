@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
-import { Column, Table as TableModel } from "../state/models";
+import { Table as TableModel } from "../state/models";
 import { useParams } from "react-router-dom";
 import { API_GET_TABLE_DETAIL } from "../common/constants";
 
@@ -34,7 +34,9 @@ export default function TableDetail() {
       <ModuleTitle label="Table Detail" />
       <Box sx={{ marginBottom: 2 }}>
         <Typography variant="h5">{tableInfo?.tableName}</Typography>
-        <Typography variant="body2">{tableInfo?.tableDesc}</Typography>
+        <Typography variant="body2" color="secondary">
+          {tableInfo?.tableDesc}
+        </Typography>
       </Box>
       <TableContainer component={Paper}>
         <Table>

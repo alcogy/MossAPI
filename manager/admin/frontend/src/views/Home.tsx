@@ -19,7 +19,7 @@ export default function HomeView() {
             display: "flex",
             flexDirection: "column",
             gap: 3,
-            minWidth: "560px",
+            width: "560px",
           }}
         >
           <InfrastructureInfo />

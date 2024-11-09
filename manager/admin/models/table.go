@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func GetAllTables(db *sqlx.DB) []string {
+func GetAllTables(db *sqlx.DB) []mysql.Table {
 	return mysql.FetchAllTable(db)
 }
 

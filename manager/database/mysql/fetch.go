@@ -9,16 +9,20 @@ import (
 )
 
 // FetchAllTable returns all table info.
-func FetchAllTable(db *sqlx.DB) []string {
-	var tables []string
-	rows, err := db.Query(`show tables`)
+func FetchAllTable(db *sqlx.DB) []Table {
+	var tables []Table
+	rows, err := db.Queryx(`SHOW TABLE STATUS`)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 	for rows.Next() {
-		var tb string
-		rows.Scan(&tb)
+		var ti TableInfo
+		rows.StructScan(&ti)
+		tb := Table{
+			TableName: ti.Name,
+			TableDesc: ti.Comment,
+		}
 		tables = append(tables, tb)
 	}
 
@@ -91,7 +95,7 @@ func getTableInfo(db *sqlx.DB, tb string) TableInfo {
 }
 
 func getColumnInfo(db *sqlx.DB, tb string) []ColumnInfo {
-	sql := fmt.Sprintf("SHOW FULL COLUMNS FROM %s", tb)
+	sql := fmt.Sprintf("SHOW FULL COLUMNS FROM `%s`", tb)
 	rows, err := db.Queryx(sql)
 	if err != nil {
 		fmt.Println(err)
@@ -108,7 +112,7 @@ func getColumnInfo(db *sqlx.DB, tb string) []ColumnInfo {
 }
 
 func getIndexInfo(db *sqlx.DB, tb string) []IndexInfo {
-	sql := fmt.Sprintf("SHOW index FROM %s", tb)
+	sql := fmt.Sprintf("SHOW index FROM `%s`", tb)
 	rows, err := db.Queryx(sql)
 	if err != nil {
 		fmt.Println(err)

@@ -114,6 +114,7 @@ func CreateTable(db *sqlx.DB, tb Table) error {
 	sql := makeCreateTableSql(tb)
 	_, err := db.Exec(sql)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	return nil
