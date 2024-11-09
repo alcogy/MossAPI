@@ -29,5 +29,6 @@ export interface Service {
   id: string;
   name: string;
   port: string;
+  state: string;
   status: string;
 }

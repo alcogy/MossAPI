@@ -104,7 +104,7 @@ export default function SearviceList() {
               <TableRow key={value.id}>
                 <TableCell>{value.id}</TableCell>
                 <TableCell>{value.name}</TableCell>
-                <TableCell>{value.status}</TableCell>
+                <TableCell>{value.state}</TableCell>
                 <TableCell sx={{ width: "1%", whiteSpace: "nowrap" }}>
                   <ButtonGroup
                     variant="contained"
