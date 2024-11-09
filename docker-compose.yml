@@ -14,11 +14,3 @@ services:
     volumes:
       - ./database/mysql/conf:/etc/mysql/conf.d/:ro
       - ./database/data/mysql/:/var/lib/mysql
-
-  redis:
-    image: redis:7.4.1
-    ports:
-      - 6379:6379
-    volumes:
-      - ./database/data/redis/:/data
-    command: redis-server --requirepass pass
