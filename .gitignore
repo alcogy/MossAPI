@@ -2,7 +2,6 @@
 /gateway/app/go.sum
 
 /services
-/samples
 
 /manager/admin/frontend/node_modules
 /manager/admin/frontend/package-lock.json

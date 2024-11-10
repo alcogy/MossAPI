@@ -13,17 +13,17 @@ import (
 
 func main() {
 	// Database Open
-	mysql, err := mysql.Connection()
+	db, err := mysql.Connection()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer mysql.Close()
+	defer db.Close()
 
 	// Show admin on browser.
 	arg := os.Args[1]
 	
 	if arg == "admin" {
-		admin.Serve(mysql)
+		admin.Serve(db)
 
 	} else if arg == "rm" {
 		service := os.Args[2]
@@ -33,7 +33,7 @@ func main() {
 			return 
 		}
 
-		command.RemoveService(service, mysql)
+		command.RemoveService(service, db)
 		
 	} else {
 		// Command
@@ -46,7 +46,7 @@ func main() {
 			return
 		}
 		
-		command.ExecuteBuild(f, mysql)
+		command.ExecuteBuild(f, db)
 	}
 	
 }

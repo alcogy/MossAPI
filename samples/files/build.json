@@ -1,0 +1,10 @@
+{
+  "services": [
+    {
+      "service": "mytest1",
+      "options": "",
+      "artifact": "C:\\Users\\info\\Dev\\MossAPI\\samples\\go\\output",
+      "execute": "./a"
+    }
+  ]
+}
