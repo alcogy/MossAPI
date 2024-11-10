@@ -2,9 +2,11 @@ package command
 
 import (
 	"encoding/json"
-	"fmt"
+	"manager/admin/models"
 	"manager/admin/types"
+	"manager/container"
 	"manager/database/mysql"
+	"manager/libs"
 	"os"
 
 	"github.com/jmoiron/sqlx"
@@ -18,11 +20,11 @@ type Backend struct {
 func ExecuteBuild(path string, db *sqlx.DB) {
 	backend := readFile(path)
 	for _, s := range backend.Services {
-		fmt.Println(s)
+		buildService(s)
 	}
 
 	for _, t := range backend.Tables {
-		fmt.Println(t)
+		buildTable(t, db)
 	}
 }
 
@@ -48,4 +50,18 @@ func readFile(path string) Backend {
 	}
 
 	return backend
+}
+
+func buildService(body types.CreateServiceBody) {
+	content := container.GenerateContent(body)
+	container.GenerateDockerfile(body.Service, content)
+	libs.CopyFileTree(body.Artifact, container.GetServiceDir(body.Service))
+	container.BuildAndCreate(body.Service)
+}
+
+func buildTable(table mysql.Table, db *sqlx.DB) {
+	if len(table.Columns) == 0 {
+		return
+	}
+	models.CreateTable(db, table)
 }

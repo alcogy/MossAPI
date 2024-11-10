@@ -19,22 +19,34 @@ func main() {
 	}
 	defer mysql.Close()
 
-	// TODO Implementdump.
-
 	// Show admin on browser.
-	if os.Args[1] == "admin" {
+	arg := os.Args[1]
+	
+	if arg == "admin" {
 		admin.Serve(mysql)
+
+	} else if arg == "rm" {
+		service := os.Args[2]
+		fmt.Println(service)
+		if service == "" {
+			fmt.Println("Please specify service name.")
+			return 
+		}
+
+		command.RemoveService(service, mysql)
+		
 	} else {
 		// Command
-		f := flag.String("f", "", "Filepath to json")
+		var f string
+		flag.StringVar(&f, "f", "", "Filepath to json")
 		flag.Parse()
 
-		if *f == "" {
+		if f == "" {
 			fmt.Println("Please specify file path with -f option.")
+			return
 		}
 		
-		command.ExecuteBuild(*f, mysql)
+		command.ExecuteBuild(f, mysql)
 	}
-	
 	
 }
