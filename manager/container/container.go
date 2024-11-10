@@ -14,13 +14,6 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
-type Container struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	State string `json:"state"`
-	Status string `json:"status"`
-}
-
 // GetContainerID get container ID by service name.
 func GetContainerID(service string) string {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
