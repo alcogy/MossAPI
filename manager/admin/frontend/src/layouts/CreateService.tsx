@@ -3,7 +3,10 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { TextField } from "@mui/material";
 import { useState } from "react";
-import { API_SERVICE_CREATE } from "../common/constants";
+import { API_GET_SERVICES, API_SERVICE_CREATE } from "../common/constants";
+import { loadingState, serviceListState } from "../state/atoms";
+import { useRecoilState } from "recoil";
+import { Service } from "../state/models";
 
 interface ServiceForm {
   name: string;
@@ -21,22 +24,38 @@ const initServiceForm = {
 
 export default function CreateService() {
   const [form, setForm] = useState<ServiceForm>(initServiceForm);
-  const onClickCreate = async () => {
-    const result = await fetch(API_SERVICE_CREATE, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        service: form.name,
-        artifact: form.artifact,
-        options: form.options,
-        execute: form.execute,
-      }),
-    });
+  const [_serviceList, setServiceList] = useRecoilState(serviceListState);
+  const [_isLoading, setIsLoading] = useRecoilState(loadingState);
 
-    console.log(result);
-    setForm(initServiceForm);
+  // Click create button handler.
+  const onClickCreate = async () => {
+    setIsLoading(true);
+    try {
+      const result = await fetch(API_SERVICE_CREATE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          service: form.name,
+          artifact: form.artifact,
+          options: form.options,
+          execute: form.execute,
+        }),
+      });
+      const data = await result.json();
+      if (data["message"] === "ok") {
+        const response = await fetch(API_GET_SERVICES);
+        const data = await response.json();
+        setServiceList(data as Service[]);
+        setForm(initServiceForm);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Sorry, you got error.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

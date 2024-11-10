@@ -4,6 +4,7 @@ import (
 	"manager/admin/types"
 	"manager/container"
 	"manager/libs"
+	"os"
 )
 
 func GetAllServices() []container.Container {
@@ -31,4 +32,5 @@ func StopService(containerID string) {
 
 func RemoveService(service string) {
 	container.RemoveContainerAndImage(service)
+	os.RemoveAll(container.GetServiceDir(service))
 }

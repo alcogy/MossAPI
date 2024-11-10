@@ -72,9 +72,7 @@ func Gen(flags model.Flags) {
 // Remove container, docker image and service directory
 func Remove(flags model.Flags) {
 	container.RemoveContainerAndImage(flags.Service)
-
-	// TODO Cooment out for dev and debug.
-	// os.RemoveAll(container.GetServiceDir(flags.Service))
+	os.RemoveAll(container.GetServiceDir(flags.Service))
 }
 
 // ----------------------------------------

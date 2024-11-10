@@ -25,85 +25,101 @@ import {
   API_SERVICE_REMOVE,
   API_GET_SERVICES,
 } from "../common/constants";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Service } from "../state/models";
 import CircleIcon from "@mui/icons-material/Circle";
 
 export default function SearviceList() {
-  const serviceList = useRecoilValue(serviceListState);
-  const [_, setIsLoading] = useRecoilState(loadingState);
-  const [services, setServices] = useState<Service[]>();
+  const [serviceList, setServiceList] = useRecoilState(serviceListState);
+  const [_isLoading, setIsLoading] = useRecoilState(loadingState);
 
   // Click start container handler.
   const onClickStart = async (containerID: string) => {
     setIsLoading(true);
-    await fetch(API_SERVICE_START + containerID, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .catch((e) => {
-        console.error(e);
-        alert("Sorry you got error.");
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      const response = await fetch(API_SERVICE_START + containerID, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-    // TODO update service list on recoil.
+      const json = await response.json();
+      if (json["message"] === "ok") {
+        await fetchServiceList();
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Sorry you got error.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Click stop container handler.
   const onClickStop = async (containerID: string) => {
     setIsLoading(true);
-    await fetch(API_SERVICE_STOP + containerID, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .catch((e) => {
-        console.error(e);
-        alert("Sorry you got error.");
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      const response = await fetch(API_SERVICE_STOP + containerID, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-    // TODO update service list on recoil.
+      const json = await response.json();
+      if (json["message"] === "ok") {
+        await fetchServiceList();
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Sorry you got error.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Click remove container handler.
   const onClickRemove = async (service: string) => {
     setIsLoading(true);
-    await fetch(API_SERVICE_REMOVE + service, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .catch((e) => {
-        console.error(e);
-        alert("Sorry you got error.");
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      const response = await fetch(API_SERVICE_REMOVE + service, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-    // TODO update service list on recoil.
+      const json = await response.json();
+      if (json["message"] === "ok") {
+        await fetchServiceList();
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Sorry you got error.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // string to only top Upper
+  // ex) string -> String, STRING -> String.
   const topUpper = (str: string): string => {
     const top = str[0].toUpperCase();
     const rest = str.slice(1).toLowerCase();
     return top + rest;
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchServiceList = async () => {
+    try {
       const response = await fetch(API_GET_SERVICES);
       const data = await response.json();
-      setServices(data as Service[]);
-    };
-    fetchData().catch((e) => console.error(e));
+      setServiceList(data as Service[]);
+    } catch (e) {
+      console.error(e);
+      alert("Sorry you got error.");
+    }
+  };
+
+  useEffect(() => {
+    fetchServiceList();
   }, []);
 
   return (
@@ -127,7 +143,7 @@ export default function SearviceList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {services?.map((value) => (
+            {serviceList?.map((value) => (
               <TableRow key={value.id}>
                 <TableCell>{value.id}</TableCell>
                 <TableCell>{value.name}</TableCell>

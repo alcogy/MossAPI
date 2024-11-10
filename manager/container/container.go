@@ -142,8 +142,7 @@ func Remove(containerID string) {
 
 // ----------------------------------------------------
 // Delete container and docker image.
-// TODO Delete conteiner and image not perfect.
-func RemoveContainerAndImage(service string) {
+func RemoveContainerAndImage(service string) error {
 	containerID := GetContainerID(service)
 	
 	StopContainer(containerID)
@@ -151,20 +150,22 @@ func RemoveContainerAndImage(service string) {
 	// Get Client
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return err
 	}
 	defer cli.Close()
 	ctx := context.Background()
 	
 	if (containerID != "") {
 		cli.ContainerRemove(ctx, containerID, container.RemoveOptions{})
-		cli.ContainersPrune(ctx, filters.Args{})
 	}
 	
 	images, err := cli.ImageList(ctx, image.ListOptions{All: false})
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return err
 	}
+
 	for _, img := range images {
 		if len(img.RepoTags) == 0 {
 			continue
@@ -178,6 +179,8 @@ func RemoveContainerAndImage(service string) {
 	}
 	
 	fmt.Println("Remove container and image.")
+
+	return nil
 }
 
 func run(ctx context.Context, cli *client.Client, containerID string) error {
