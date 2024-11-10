@@ -1,12 +1,12 @@
 import { atom } from "recoil";
-import { Service, Table } from "./models";
+import { Service, TableInfo } from "./models";
 
 export const loadingState = atom<boolean>({
   key: "Loading",
   default: false,
 });
 
-export const tableListState = atom<Table[]>({
+export const tableListState = atom<TableInfo[]>({
   key: "TableList",
   default: [],
 });

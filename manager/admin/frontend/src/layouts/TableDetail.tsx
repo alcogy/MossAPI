@@ -12,19 +12,19 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
-import { Table as TableModel } from "../state/models";
+import { TableInfo } from "../state/models";
 import { useParams } from "react-router-dom";
 import { API_GET_TABLE_DETAIL } from "../common/constants";
 
 export default function TableDetail() {
-  const [tableInfo, setTableInfo] = useState<TableModel>();
+  const [tableInfo, setTableInfo] = useState<TableInfo>();
   const { table } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(API_GET_TABLE_DETAIL + table);
       const data = await response.json();
-      setTableInfo(data as TableModel);
+      setTableInfo(data as TableInfo);
     };
     fetchData().catch((e) => console.error(e));
   }, [table]);

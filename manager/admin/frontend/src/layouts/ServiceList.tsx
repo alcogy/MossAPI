@@ -17,7 +17,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
 import AddIcon from "@mui/icons-material/Add";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { loadingState, serviceListState } from "../state/atoms";
 import {
   API_SERVICE_START,
@@ -119,7 +119,8 @@ export default function SearviceList() {
   };
 
   useEffect(() => {
-    fetchServiceList();
+    const fetchData = async () => await fetchServiceList();
+    fetchData();
   }, []);
 
   return (

@@ -1,4 +1,4 @@
-export interface Table {
+export interface TableInfo {
   tableName: string;
   tableDesc: string;
   columns?: Column[];

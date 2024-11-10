@@ -42,6 +42,12 @@ http://service:9000/:param
 
 3. Make Contaier using admin from manager.
 
+4. Access to your service
+
+```
+http://localhost:9000/<service>/
+```
+
 ## Manager
 
 Management conteiner and database tables.

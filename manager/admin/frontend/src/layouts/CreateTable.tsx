@@ -3,27 +3,25 @@ import ModuleTitle from "../components/ModuleTitle";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { IconButton, TextField } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { API_TABLE_CREATE, typeList } from "../common/constants";
-import { Column, ColumnFormParams } from "../state/models";
+import {
+  API_GET_TABLES,
+  API_TABLE_CREATE,
+  INIT_COLUMN_INFO,
+  typeList,
+} from "../common/constants";
+import { Column, ColumnFormParams, TableInfo } from "../state/models";
 import TableForm from "../components/TableForm";
-
-export const initColunInfo: Column = {
-  name: "",
-  type: 10,
-  size: 0,
-  pk: false,
-  nullable: false,
-  unique: 0,
-  index: 0,
-  comment: "",
-};
+import { useRecoilState } from "recoil";
+import { loadingState, tableListState } from "../state/atoms";
 
 export default function CreateTable() {
   const [tableName, setTableName] = useState<string>("");
   const [tableDesc, setTableDesc] = useState<string>("");
-  const [columns, setColumns] = useState<Column[]>([{ ...initColunInfo }]);
+  const [columns, setColumns] = useState<Column[]>([{ ...INIT_COLUMN_INFO }]);
+  const [_isLoading, setIsLoading] = useRecoilState(loadingState);
+  const [_tableList, setTableList] = useRecoilState(tableListState);
 
   const disabled = (): boolean => {
     if (tableName === "") return true;
@@ -74,26 +72,36 @@ export default function CreateTable() {
 
   const onClickCreate = async () => {
     if (!window.confirm("Do you registrate data?")) return;
-    const result = await fetch(API_TABLE_CREATE, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        tableName: tableName,
-        tableDesc: tableDesc,
-        columns: columns.map((v) => {
-          return { ...v, type: getTypeLabel(v) };
+    setIsLoading(true);
+    try {
+      const result = await fetch(API_TABLE_CREATE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tableName: tableName,
+          tableDesc: tableDesc,
+          columns: columns.map((v) => {
+            return { ...v, type: getTypeLabel(v) };
+          }),
         }),
-      }),
-    });
-    const json = await result.json();
-    if (json["message"] !== "ok") {
-      alert("error occured.");
-      console.error(json["message"]);
+      });
+      const json = await result.json();
+      if (json["message"] === "ok") {
+        const response = await fetch(API_GET_TABLES);
+        const data = await response.json();
+        setTableList(data as TableInfo[]);
+        setTableName("");
+        setTableDesc("");
+        setColumns([{ ...INIT_COLUMN_INFO }]);
+      }
+    } catch (e) {
+      alert("Sorry you got error.");
+      console.error(e);
+    } finally {
+      setIsLoading(false);
     }
-    setTableName("");
-    setColumns([{ ...initColunInfo }]);
   };
 
   const getTypeLabel = (column: Column) => {
@@ -106,7 +114,7 @@ export default function CreateTable() {
 
   useEffect(() => {
     return () => {
-      setColumns([{ ...initColunInfo }]);
+      setColumns([{ ...INIT_COLUMN_INFO }]);
     };
   }, []);
 
@@ -159,7 +167,7 @@ export default function CreateTable() {
           </Box>
           <Box sx={{ marginTop: 1 }}>
             <IconButton
-              onClick={() => setColumns([...columns, { ...initColunInfo }])}
+              onClick={() => setColumns([...columns, { ...INIT_COLUMN_INFO }])}
             >
               <AddBoxIcon />
             </IconButton>

@@ -15,19 +15,14 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import Paper from "@mui/material/Paper";
 import ModuleTitle from "../components/ModuleTitle";
 import AddIcon from "@mui/icons-material/Add";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { tableListState } from "../state/atoms";
 import { API_GET_TABLES, API_TABLE_DELETE } from "../common/constants";
-import { useEffect, useState } from "react";
-
-interface TableList {
-  tableName: string;
-  tableDesc: string;
-}
+import { useEffect } from "react";
+import { TableInfo } from "../state/models";
 
 export default function TableList() {
-  const tableList = useRecoilValue(tableListState);
-  const [tables, setTables] = useState<TableList[]>([]);
+  const [tableList, setTableList] = useRecoilState(tableListState);
 
   const onClickRemove = async (table: string) => {
     const res = await fetch(API_TABLE_DELETE + table, {
@@ -38,18 +33,23 @@ export default function TableList() {
     });
     const json = await res.json();
     if (json["message"] === "ok") {
-      setTables(tables.filter((v) => v.tableName !== table));
+      await fetchTableList();
     }
-    // TODO update table list on recoil.
+  };
+
+  const fetchTableList = async () => {
+    try {
+      const response = await fetch(API_GET_TABLES);
+      const data = await response.json();
+      setTableList(data as TableInfo[]);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(API_GET_TABLES);
-      const data = await response.json();
-      setTables(data as TableList[]);
-    };
-    fetchData().catch((e) => console.error(e));
+    const fetchData = async () => await fetchTableList();
+    fetchData();
   }, []);
 
   return (
@@ -73,8 +73,8 @@ export default function TableList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tables &&
-              tables.map((value, index) => (
+            {tableList &&
+              tableList.map((value, index) => (
                 <TableRow key={index}>
                   <TableCell sx={{ width: 0, whiteSpace: "nowrap" }}>
                     {value.tableName}

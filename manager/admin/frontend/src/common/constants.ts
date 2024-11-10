@@ -1,3 +1,5 @@
+import { Column } from "../state/models";
+
 const urlRoot = "http://localhost:5500/api/";
 
 export const API_GET_INFRASTRUCTURE = urlRoot + "infrastructure";
@@ -43,3 +45,14 @@ export const segmentList = [
   { value: 15, label: "15" },
   { value: 16, label: "16" },
 ];
+
+export const INIT_COLUMN_INFO: Column = {
+  name: "",
+  type: 10,
+  size: 0,
+  pk: false,
+  nullable: false,
+  unique: 0,
+  index: 0,
+  comment: "",
+};
