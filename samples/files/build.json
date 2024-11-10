@@ -1,10 +1,42 @@
 {
   "services": [
     {
-      "service": "newservice",
+      "service": "ns1",
       "options": "",
       "artifact": "/app/output",
       "execute": "./a"
+    },
+    {
+      "service": "ns2",
+      "options": "",
+      "artifact": "/app/output",
+      "execute": "./a"
+    }
+  ],
+  "tables": [
+    {
+      "tableName": "build",
+      "tableDesc": "This is a table.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "unique": 0,
+          "index": 0,
+          "comment": "This is a ID."
+        },
+        {
+          "name": "name",
+          "type": "varchar(255)",
+          "pk": false,
+          "nullable": false,
+          "unique": 0,
+          "index": 0,
+          "comment": "This is a name."
+        }
+      ]
     }
   ]
 }

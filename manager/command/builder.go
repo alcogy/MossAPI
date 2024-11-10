@@ -14,7 +14,7 @@ import (
 
 type Backend struct {
 	Services []types.CreateServiceBody `json:"services"`
-	Tables []mysql.Table	`json:"tables"`
+	Tables   []mysql.Table             `json:"tables"`
 }
 
 func ExecuteBuild(path string, db *sqlx.DB) {
