@@ -37,24 +37,25 @@ func GetContainerID(service string) string {
 		return ""
 	}
 
-	var containerID string
 	for _, v := range containers {
 		if v.Names[0] == "/" + service {
-			containerID = v.ID
+			return v.ID
 		}
 	}
 
-	return containerID
+	return ""
 }
 
 func IsActiveGateway() bool {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return false
 	}
 	containers, err := cli.ContainerList(context.Background(), container.ListOptions{ All: true })
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return false
 	}
 	for _, ctr := range containers {
 		name := ctr.Names[0][1:] 
@@ -172,7 +173,7 @@ func RemoveContainerAndImage(service string) error {
 		}
 		tags := strings.Split(img.RepoTags[0], ":")
 		if tags[0] == service {
-			fmt.Println(img.ID)
+			fmt.Println("Remove image: " + img.ID)
 			cli.ImageRemove(ctx, img.ID, image.RemoveOptions{Force: true, PruneChildren: true})
 			cli.ImagesPrune(ctx, filters.Args{})
 		}

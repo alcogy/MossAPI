@@ -17,7 +17,6 @@ func CopyFileTree(root string, dist string) {
 		}
 		fmt.Println(path)
 
-		// root := "../services/" + flags.Service
 		from := strings.Replace(path, root, "", -1)
 
 		// Make directory

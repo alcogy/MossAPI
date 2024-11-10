@@ -1,114 +1,51 @@
 package command
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
-	"io/fs"
-	"manager/container"
-	"manager/model"
+	"manager/admin/types"
+	"manager/database/mysql"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 )
 
-func SwitchCommand(flags model.Flags, db *sqlx.DB) {
-	switch flags.Command {
-	
-	case "run":
-		Run(flags)
+type Backend struct {
+	Services []types.CreateServiceBody `json:"services"`
+	Tables []mysql.Table	`json:"tables"`
+}
 
-	case "stop":
-		cid := container.GetContainerID(flags.Service)
-		container.StopContainer(cid)
+func ExecuteBuild(path string, db *sqlx.DB) {
+	backend := readFile(path)
+	for _, s := range backend.Services {
+		fmt.Println(s)
+	}
 
-	case "gen":
-		Gen(flags)
-
-	case "rm":
-		Remove(flags)
-	
-	case "copy":
-		CopyArtifact(flags)
-
-	default:
-		message := "Not Found command \"%s\".\n"
-		message += "You can use commands are below.\n"
-		message += "-------------------\n"
-		message += "run     make and run the service.\n"
-		message += "stop    stop the service.\n"
-		message += "gen     generate service and run it.\n"
-		message += "rm    	remove service.\n"
-
-		fmt.Printf(message, flags.Command)
+	for _, t := range backend.Tables {
+		fmt.Println(t)
 	}
 }
 
-// ----------------------------------------
-// Build image and run container.
-func Run(flags model.Flags) {
-	// TODO This line is for dev and debug.
-	Remove(flags)
-
-	if flags.Service == "" {
-		fmt.Printf("You must specify service name.")
-		return
+func readFile(path string) Backend {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		panic(err)
 	}
-	// Check Exist Service
-	container.BuildAndRun(flags.Service)
-}
 
-// ----------------------------------------
-// Generate Dockerfile with content. And Run Container.
-func Gen(flags model.Flags) {
-	
-	// Make Dockerfile with content.
-	// content := container.GenerateContent(flags.Service, nil)
-	// container.GenerateDockerfile(flags.Service, content)
-}
+	if fileInfo == nil || fileInfo.IsDir() {
+		panic("File path is not correct.")
+	}
 
-// ----------------------------------------
-// Remove container, docker image and service directory
-func Remove(flags model.Flags) {
-	container.RemoveContainerAndImage(flags.Service)
-	os.RemoveAll(container.GetServiceDir(flags.Service))
-}
+	file, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
 
-// ----------------------------------------
-// Copy artifact for api to service directory.
-func CopyArtifact(flags model.Flags) {
-	filepath.Walk(flags.Artifact, func (path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
-			return err
-		}
-		fmt.Println(path)
+	var backend Backend
+	err = json.Unmarshal(file, &backend)
+	if err != nil {
+		panic(err)
+	}
 
-		root := "../services/" + flags.Service
-		from := strings.Replace(path, flags.Artifact, "", -1)
-
-		// Make directory
-		if info.IsDir() && path != flags.Artifact {
-			dist := root + from
-			os.MkdirAll(dist, 0750)
-		}
-
-		if !info.IsDir() {
-			r, err := os.Open(path)
-			if err != nil {
-				panic(err)
-			}
-			defer r.Close()
-
-			w, err := os.Create(root + from)
-			if err != nil {
-				panic(err)
-			}
-			defer w.Close()
-
-			io.Copy(w, r)
-		}
-		return nil
-	})
+	return backend
 }

@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
 	"manager/admin"
 	"manager/command"
 	"manager/database/mysql"
-	"manager/model"
 )
 
 func main() {
@@ -19,20 +19,21 @@ func main() {
 	}
 	defer mysql.Close()
 
-	// TODO for debug.
+	// TODO Implementdump.
+
+	// Show admin on browser.
 	if os.Args[1] == "admin" {
 		admin.Serve(mysql)
 	} else {
 		// Command
-		c := flag.String("c", "", "Command name.")
-		s := flag.String("s", "", "Service name.")
-		a := flag.String("a", "", "Artifact directory path.")
-		e := flag.String("e", "", "execute command.")
-
+		f := flag.String("f", "", "Filepath to json")
 		flag.Parse()
-		flags := model.Flags{Command: *c, Service: *s, Artifact: *a, Execute: *e}
+
+		if *f == "" {
+			fmt.Println("Please specify file path with -f option.")
+		}
 		
-		command.SwitchCommand(flags, mysql)
+		command.ExecuteBuild(*f, mysql)
 	}
 	
 	

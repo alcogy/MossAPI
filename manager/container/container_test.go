@@ -16,11 +16,13 @@ func beforeAll(t *testing.T) {
 
 func TestGetContainerID(t *testing.T) {
 	beforeAll(t)
+	service := "testservice"	
+	BuildAndCreate(service)
+	defer RemoveContainerAndImage(service)
 
-	cid := GetContainerID("customer")
-	want := "763ad7604424"
-	if cid[:12] != want {
-		t.Fatalf("Expected %v, but get %v", want, cid[:12])
+	cid := GetContainerID(service)
+	if cid == "" {
+		t.Fatalf("ContainerID is blank")
 	}
 	
 	fmt.Println(cid)
@@ -28,6 +30,9 @@ func TestGetContainerID(t *testing.T) {
 
 func TestAllContainers(t *testing.T) {
 	beforeAll(t)
+	service := "testservice"	
+	BuildAndCreate(service)
+	defer RemoveContainerAndImage(service)
 
 	containers := FetchAllServices()
 	if len(containers) == 0 {
@@ -39,16 +44,17 @@ func TestAllContainers(t *testing.T) {
 
 func TestRemove(t *testing.T) {
 	beforeAll(t)
-
-	cid := "763ad7604424"
-	Remove(cid)
-
+	service := "testservice"	
+	BuildAndCreate(service)
+	defer RemoveContainerAndImage(service)
+	
 	containers := FetchAllServices()
 	for _, v := range containers {
-		if v.ID[:12] == cid {
+		if v.Name == "/" + service {
 			t.Fatal("Container is not deleted.")
 		}
 	}
+
 }
 
 func TestBuildAndCreate(t *testing.T) {
@@ -59,12 +65,5 @@ func TestBuildAndCreate(t *testing.T) {
 	GenerateDockerfile(service, content)
 	BuildAndCreate(service)
 
-	// ctx := context.Background()
-
-	// cli, err := client.NewClientWithOpts(client.FromEnv)
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-	// build(ctx, cli, service)
 	os.RemoveAll(GetServiceDir(service))
 }
