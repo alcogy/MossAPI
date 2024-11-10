@@ -3,11 +3,13 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import HomeView from "./views/Home";
-import { RecoilRoot } from "recoil";
+import { RecoilRoot, useRecoilValue } from "recoil";
+import Loading from "./components/Loading";
+import { loadingState } from "./state/atoms";
 
 function App() {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
+  const isLoading = useRecoilValue(loadingState);
   const theme = createTheme({
     palette: {
       mode: isDarkMode ? "dark" : "light",
@@ -39,12 +41,11 @@ function App() {
   });
 
   return (
-    <RecoilRoot>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <HomeView />
-      </ThemeProvider>
-    </RecoilRoot>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <HomeView />
+      {isLoading && <Loading />}
+    </ThemeProvider>
   );
 }
 

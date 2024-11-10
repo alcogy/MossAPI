@@ -26,6 +26,22 @@ docker build -t gateway <path to Dockerfile>
 docker run --name gateway -p 9000:9000 --network mossapi-nw-private --network mossapi-nw-public -d gateway
 ```
 
+### How to make service
+
+1. Develop REST API
+
+- Port number must be 9000.
+- You can use HTTP methods are "GET", "POST", "PUT", "DELETE".
+- You can use URL param, getting url pattern is below.
+
+```
+http://service:9000/:param
+```
+
+2. Put execute file and dependencie files to root directory.
+
+3. Make Contaier using admin from manager.
+
 ## Manager
 
 Management conteiner and database tables.

@@ -180,29 +180,33 @@ func RemoveContainerAndImage(service string) {
 	fmt.Println("Remove container and image.")
 }
 
-func run(ctx context.Context, cli *client.Client, containerID string) {
+func run(ctx context.Context, cli *client.Client, containerID string) error {
 	
 	if err := cli.ContainerStart(
 		ctx,
 		containerID,
 		container.StartOptions{},
 	); err != nil {
-		panic(err)
+		return err
 	}
 
-	statusCh, errCh := cli.ContainerWait(ctx, containerID, container.WaitConditionNotRunning)
-	select {
-	case err := <-errCh:
+	go func() {
+		statusCh, errCh := cli.ContainerWait(ctx, containerID, container.WaitConditionNotRunning)
+		select {
+		case err := <-errCh:
+			if err != nil {
+				return 
+			}
+		case <-statusCh:
+		}
+	
+		out, err := cli.ContainerLogs(ctx, containerID, container.LogsOptions{ShowStdout: true})
 		if err != nil {
 			panic(err)
 		}
-	case <-statusCh:
-	}
-
-	out, err := cli.ContainerLogs(ctx, containerID, container.LogsOptions{ShowStdout: true})
-	if err != nil {
-		panic(err)
-	}
-
-	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	
+		stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	}()
+	
+	return nil
 }
