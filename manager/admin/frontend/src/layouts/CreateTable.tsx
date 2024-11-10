@@ -149,7 +149,7 @@ export default function CreateTable() {
             variant="subtitle1"
             sx={{ fontWeight: "bold", marginBottom: 2 }}
           >
-            Setting Columns
+            Columns
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             {columns.length === 0 && (
@@ -166,11 +166,14 @@ export default function CreateTable() {
             ))}
           </Box>
           <Box sx={{ marginTop: 1 }}>
-            <IconButton
+            <Button
               onClick={() => setColumns([...columns, { ...INIT_COLUMN_INFO }])}
+              startIcon={<AddBoxIcon />}
+              variant="text"
+              color="secondary"
             >
-              <AddBoxIcon />
-            </IconButton>
+              Add row
+            </Button>
           </Box>
         </Box>
 

@@ -99,6 +99,14 @@ export default function SearviceList() {
     }
   };
 
+  const getIndicatorColor = (
+    status: string
+  ): "success" | "disabled" | "error" => {
+    if (status === "running") return "success";
+    if (status === "exited") return "error";
+    return "disabled";
+  };
+
   // string to only top Upper
   // ex) string -> String, STRING -> String.
   const topUpper = (str: string): string => {
@@ -151,7 +159,7 @@ export default function SearviceList() {
                 <TableCell>
                   <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                     <CircleIcon
-                      color={value.state === "running" ? "success" : "disabled"}
+                      color={getIndicatorColor(value.state)}
                       fontSize="small"
                     />
                     <Typography variant="body2">
