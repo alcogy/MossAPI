@@ -14,7 +14,7 @@ func beforeAll(t *testing.T) {
 	t.Cleanup(func() {
 		os.Chdir(cwd)
 	})
-	os.Chdir("../../")
+	os.Chdir("../")
 }
 
 func sampleData(name string) Table {
@@ -79,5 +79,5 @@ func TestCreateTable(t *testing.T) {
 		t.Fatal(err)
 	}	
 	
-	//DeleteTable(db, tableName)
+	DeleteTable(db, tableName)
 }

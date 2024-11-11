@@ -15,7 +15,6 @@ func GenerateContent(body types.CreateServiceBody) string {
 	var content string
 	executes :=strings.Split(body.Execute, " ")
 
-	// TODO make template file.
 	content += "FROM debian:12-slim\n\n"
 	content += "RUN apt update && apt upgrade -y\n"
 	// If you use centOS

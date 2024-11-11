@@ -27,14 +27,22 @@ func main() {
 
 	} else if arg == "rm" {
 		service := os.Args[2]
-		fmt.Println(service)
 		if service == "" {
 			fmt.Println("Please specify service name.")
 			return 
 		}
 
 		command.RemoveService(service, db)
-		
+	
+	} else if arg == "dump" {
+		path := os.Args[2]
+		if path == "" {
+			fmt.Println("Please export file path.")
+			return
+		}
+
+		command.Dump(path, db)
+	
 	} else {
 		// Command
 		var f string
