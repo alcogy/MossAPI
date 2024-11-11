@@ -21,15 +21,18 @@ func GenerateContent(body types.CreateServiceBody) string {
 	// content += "FROM centos:7\n\n"
 	// content += "RUN yum update && yum upgrade -y\n"
 
+	var cmds []string
+	for _, command := range executes  {
+		cmds = append(cmds, "\"" + command + "\"") 
+	}
+	
 	content += body.Options
 	content += "\n"
 	content += "WORKDIR /app\n"
 	content += "EXPOSE 9000\n"
 	content += "COPY . .\n\n"
 	content += "CMD ["
-	for _, command := range executes  {
-		content += "\"" + command + "\""
-	}
+	content += strings.Join(cmds, ",")
 	content += "]"
 
 	return content
