@@ -6,6 +6,7 @@ type Message struct {
 
 type CreateServiceBody struct {
 	Service  string `json:"service"`
+	Base     string `json:"base"`
 	Artifact string `json:"artifact"`
 	Options  string `json:"options"`
 	Execute  string `json:"execute"`

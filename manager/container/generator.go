@@ -19,15 +19,9 @@ func GenerateContent(body types.CreateServiceBody) string {
 		cmds = append(cmds, "\"" + command + "\"") 
 	}
 	
-	// If you use centOS
-	// content += "FROM centos:7\n\n"
-	// content += "RUN yum update && yum upgrade -y\n"
-
-	content += "FROM debian:12-slim\n\n"
-	content += "RUN apt update && apt upgrade -y\n"
+	content += getBaseImageAndUpdate(body.Base)
 	content += "WORKDIR /app\n"
 	content += "COPY . .\n\n"
-	
 	content += body.Options
 	content += "\n"
 	content += "EXPOSE 9000\n"
@@ -60,5 +54,25 @@ func GenerateDockerfile(service string, content string) {
 	_, err = f.Write([]byte(content))
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+
+func getBaseImageAndUpdate(base string) string {
+	switch base {
+	case "delian":
+		return "FROM debian:12-slim\n\nRUN apt update && apt upgrade -y\n"
+	
+	case "centos":
+		return "FROM centos:7\n\nRUN yum update && yum upgrade -y\n"
+	
+	case "alpine":
+		return "FROM alpine:3.14\n\nRUN apk update && apk upgrade -y\n"
+
+	case "python":
+		return "FROM python\n\n"
+
+	default:
+		return "FROM debian:12-slim\n\nRUN apt update && apt upgrade -y\n"
 	}
 }

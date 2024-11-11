@@ -1,22 +1,31 @@
 import ModuleTitle from "../components/ModuleTitle";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { TextField } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { useState } from "react";
 import { API_GET_SERVICES, API_SERVICE_CREATE } from "../common/constants";
 import { loadingState, serviceListState } from "../state/atoms";
 import { useRecoilState } from "recoil";
 import { Service } from "../state/models";
 
+type BaseImage = "debian" | "centos" | "alpine" | "python";
 interface ServiceForm {
-  name: string;
+  service: string;
+  base: BaseImage;
   artifact: string;
   options: string;
   execute: string;
 }
 
-const initServiceForm = {
-  name: "",
+const initServiceForm: ServiceForm = {
+  service: "",
+  base: "debian",
   artifact: "",
   options: "",
   execute: "",
@@ -36,12 +45,7 @@ export default function CreateService() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          service: form.name,
-          artifact: form.artifact,
-          options: form.options,
-          execute: form.execute,
-        }),
+        body: JSON.stringify(form),
       });
       const data = await result.json();
       if (data["message"] === "ok") {
@@ -72,9 +76,26 @@ export default function CreateService() {
         <TextField
           label="Service name"
           variant="outlined"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          value={form.service}
+          onChange={(e) => setForm({ ...form, service: e.target.value })}
         />
+        <FormControl sx={{ minWidth: "128px" }}>
+          <InputLabel id="select-label">Base image</InputLabel>
+          <Select
+            label="Base image"
+            labelId="select-label"
+            value={form.base}
+            onChange={(e) =>
+              setForm({ ...form, base: e.target.value as BaseImage })
+            }
+          >
+            {["debian", "centos", "alpine", "python"].map((v) => (
+              <MenuItem value={v} key={v}>
+                {v}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <TextField
           label="Root directory for artifact"
           variant="outlined"
