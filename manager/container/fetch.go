@@ -3,7 +3,6 @@ package container
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -12,17 +11,9 @@ import (
 
 // GetContainerID get container ID by service name.
 func GetContainerID(service string) string {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	containers, err := fetchContainers()
 	if err != nil {
-		log.Fatalln(err)
-		return ""
-	}
-	defer cli.Close()
-	ctx := context.Background()
-
-	containers, err := cli.ContainerList(ctx, container.ListOptions{All: true})
-	if err != nil {
-		log.Fatalln(err)
+		fmt.Println(err)
 		return ""
 	}
 
@@ -37,16 +28,12 @@ func GetContainerID(service string) string {
 
 // Confirm active gateway container. 
 func IsActiveGateway() bool {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	containers, err := fetchContainers()
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
-	containers, err := cli.ContainerList(context.Background(), container.ListOptions{ All: true })
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
+
 	for _, ctr := range containers {
 		name := ctr.Names[0][1:] 
 		if name == "gateway" {
@@ -86,6 +73,8 @@ func FetchAllServices() []Container {
 	return containerInfos
 }
 
+// FetchAllServicesFull is get service data list.
+// You can get more data rather than FetchAllServices.
 func FetchAllServicesFull() ([]ContainerFull, error) {
 	containers, err := fetchContainers()
 	if err != nil {
@@ -118,6 +107,8 @@ func fetchContainers() ([]types.Container, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer cli.Close()
+
 	containers, err := cli.ContainerList(context.Background(), container.ListOptions{ All: true })
 	if err != nil {
 		return nil, err
