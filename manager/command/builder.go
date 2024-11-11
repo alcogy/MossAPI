@@ -5,8 +5,8 @@ import (
 	"manager/admin/models"
 	"manager/admin/types"
 	"manager/container"
-	"manager/database/mysql"
 	"manager/libs"
+	"manager/table"
 	"os"
 
 	"github.com/jmoiron/sqlx"
@@ -14,7 +14,7 @@ import (
 
 type Backend struct {
 	Services []types.CreateServiceBody `json:"services"`
-	Tables   []mysql.Table             `json:"tables"`
+	Tables   []table.Table             `json:"tables"`
 }
 
 func ExecuteBuild(path string, db *sqlx.DB) {
@@ -59,7 +59,7 @@ func buildService(body types.CreateServiceBody) {
 	container.BuildAndCreate(body.Service)
 }
 
-func buildTable(table mysql.Table, db *sqlx.DB) {
+func buildTable(table table.Table, db *sqlx.DB) {
 	if len(table.Columns) == 0 {
 		return
 	}

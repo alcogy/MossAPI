@@ -1,23 +1,23 @@
 package models
 
 import (
-	"manager/database/mysql"
+	"manager/table"
 
 	"github.com/jmoiron/sqlx"
 )
 
-func GetAllTables(db *sqlx.DB) []mysql.Table {
-	return mysql.FetchAllTable(db)
+func GetAllTables(db *sqlx.DB) []table.Table {
+	return table.FetchAllTable(db)
 }
 
-func GetTableDetail(db *sqlx.DB, table string) mysql.Table {
-	return mysql.FetchTableDetail(db, table)
+func GetTableDetail(db *sqlx.DB, tb string) table.Table {
+	return table.FetchTableDetail(db, tb)
 }
 
-func CreateTable(db *sqlx.DB, table mysql.Table) error {
-	return mysql.CreateTable(db, table)
+func CreateTable(db *sqlx.DB, tb table.Table) error {
+	return table.CreateTable(db, tb)
 }
 
-func DeleteTableDetail(db *sqlx.DB, table string) error {
-	return mysql.DeleteTable(db, table)
+func DeleteTableDetail(db *sqlx.DB, tb string) error {
+	return table.DeleteTable(db, tb)
 }

@@ -18,6 +18,10 @@ func GenerateContent(body types.CreateServiceBody) string {
 	// TODO make template file.
 	content += "FROM debian:12-slim\n\n"
 	content += "RUN apt update && apt upgrade -y\n"
+	// If you use centOS
+	// content += "FROM centos:7\n\n"
+	// content += "RUN yum update && yum upgrade -y\n"
+
 	content += body.Options
 	content += "\n"
 	content += "WORKDIR /app\n"

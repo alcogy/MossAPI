@@ -3,7 +3,7 @@ package handler
 import (
 	"manager/admin/models"
 	"manager/admin/types"
-	"manager/database/mysql"
+	"manager/table"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -14,10 +14,10 @@ func GetIndexHtml(c echo.Context) error {
 	return c.File("admin/public/index.html")
 }
 
-func GetInfrastructureInfo(c echo.Context, mysql *sqlx.DB) error {
+func GetInfrastructureInfo(c echo.Context, db *sqlx.DB) error {
 	var infra types.InfrastructureInfo
 	infra.Gateway = models.IsActiveGateway()
-	err := mysql.Ping()
+	err := db.Ping()
 	if err == nil {
 		infra.Database = true
 	}	
@@ -68,7 +68,7 @@ func GetTableDetail(c echo.Context, mysql *sqlx.DB) error {
 }
 
 func CrateTable(c echo.Context, db *sqlx.DB) error {
-	var arg mysql.Table
+	var arg table.Table
 	if err := c.Bind(&arg); err != nil {
 		panic(err)
 	}

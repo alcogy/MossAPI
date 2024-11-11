@@ -8,12 +8,12 @@ import (
 
 	"manager/admin"
 	"manager/command"
-	"manager/database/mysql"
+	"manager/table"
 )
 
 func main() {
 	// Database Open
-	db, err := mysql.Connection()
+	db, err := table.Connection()
 	if err != nil {
 		log.Fatal(err)
 	}
