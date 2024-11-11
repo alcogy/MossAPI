@@ -10,8 +10,8 @@ import (
 )
 
 type DumpModel struct {
-	Services []container.Container `json:"services"`
-	Tables   []table.Table         `json:"tables"`
+	Services []container.ContainerFull `json:"services"`
+	Tables   []table.Table             `json:"tables"`
 }
 
 // Dump is export json file that service info and table info
@@ -45,8 +45,8 @@ func Dump(path string, db *sqlx.DB) error {
 }
 
 // dump all contaier info.
-func fetchAllServices() []container.Container {
-	return container.FetchAllServices()
+func fetchAllServices() []container.ContainerFull {
+	return container.FetchAllServicesFull()
 }
 
 // dump all table info.

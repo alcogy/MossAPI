@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
@@ -62,15 +63,11 @@ func IsActiveGateway() bool {
 // ----------------------------------------------------
 // Fetch all containers.
 func FetchAllServices() []Container {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	containers, err := fetchContainers()
 	if err != nil {
 		panic(err)
 	}
-	containers, err := cli.ContainerList(context.Background(), container.ListOptions{ All: true })
-	if err != nil {
-		panic(err)
-	}
-	
+
 	var containerInfos []Container;
 	for _, ctr := range containers {
 		name := ctr.Names[0][1:] 
@@ -87,4 +84,44 @@ func FetchAllServices() []Container {
 	}
 
 	return containerInfos
+}
+
+func FetchAllServicesFull() []ContainerFull {
+	containers, err := fetchContainers()
+	if err != nil {
+		panic(err)
+	}
+	
+	var containerInfos []ContainerFull;
+	for _, ctr := range containers { 
+		if ctr.Labels["group"] != "service" {
+			continue
+		}
+
+		c := ContainerFull{
+			ID: ctr.ID,
+			Names: ctr.Names,
+			ImageID: ctr.ImageID,
+			Command: ctr.Command,
+			Created: ctr.Created,
+			State: ctr.State,
+			Status: ctr.Status,
+		}
+		containerInfos = append(containerInfos, c);
+	}
+
+	return containerInfos
+}
+
+func fetchContainers() ([]types.Container, error) {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+	containers, err := cli.ContainerList(context.Background(), container.ListOptions{ All: true })
+	if err != nil {
+		return nil, err
+	}
+
+	return containers, nil
 }

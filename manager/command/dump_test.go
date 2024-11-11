@@ -19,7 +19,7 @@ func TestDump(t *testing.T) {
 	beforeAll(t)
 	db, _ := table.Connection()
 	
-	err := Dump(db, "./test.json")
+	err := Dump("./test.json", db)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
