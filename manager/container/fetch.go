@@ -86,10 +86,10 @@ func FetchAllServices() []Container {
 	return containerInfos
 }
 
-func FetchAllServicesFull() []ContainerFull {
+func FetchAllServicesFull() ([]ContainerFull, error) {
 	containers, err := fetchContainers()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	
 	var containerInfos []ContainerFull;
@@ -110,7 +110,7 @@ func FetchAllServicesFull() []ContainerFull {
 		containerInfos = append(containerInfos, c);
 	}
 
-	return containerInfos
+	return containerInfos, nil
 }
 
 func fetchContainers() ([]types.Container, error) {

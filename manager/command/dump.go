@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"fmt"
 	"manager/container"
 	"manager/table"
 	"os"
@@ -16,9 +17,6 @@ type DumpModel struct {
 
 // Dump is export json file that service info and table info
 func Dump(path string, db *sqlx.DB) error {
-	// TODO...
-	// Confirm filepath
-	// If path is root dir then make file "export.json"
 	// Get service data.
 	services := fetchAllServices()
 	// Get table data.
@@ -46,7 +44,13 @@ func Dump(path string, db *sqlx.DB) error {
 
 // dump all contaier info.
 func fetchAllServices() []container.ContainerFull {
-	return container.FetchAllServicesFull()
+	cons, err := container.FetchAllServicesFull()
+	if err != nil {
+		fmt.Println(err)
+		return []container.ContainerFull{}
+	}
+	
+	return cons
 }
 
 // dump all table info.
