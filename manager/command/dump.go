@@ -22,13 +22,13 @@ func Dump(path string, db *sqlx.DB) error {
 	// Get table data.
 	tables := fetchAllTables(db)
 	// Merge
-	backend := DumpModel{
+	dump := DumpModel{
 		Services: services,
 		Tables:   tables,
 	}
 
 	// json encode
-	data, err := json.Marshal(backend)
+	data, err := json.Marshal(dump)
 	if err != nil {
 		return err
 	}
