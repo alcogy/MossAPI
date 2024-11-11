@@ -13,24 +13,24 @@ import (
 // Currently base on debian:12-slim.
 func GenerateContent(body types.CreateServiceBody) string {
 	var content string
-	executes :=strings.Split(body.Execute, " ")
-
-	content += "FROM debian:12-slim\n\n"
-	content += "RUN apt update && apt upgrade -y\n"
-	// If you use centOS
-	// content += "FROM centos:7\n\n"
-	// content += "RUN yum update && yum upgrade -y\n"
-
+	executes := strings.Split(body.Execute, " ")
 	var cmds []string
 	for _, command := range executes  {
 		cmds = append(cmds, "\"" + command + "\"") 
 	}
 	
+	// If you use centOS
+	// content += "FROM centos:7\n\n"
+	// content += "RUN yum update && yum upgrade -y\n"
+
+	content += "FROM debian:12-slim\n\n"
+	content += "RUN apt update && apt upgrade -y\n"
+	content += "WORKDIR /app\n"
+	content += "COPY . .\n\n"
+	
 	content += body.Options
 	content += "\n"
-	content += "WORKDIR /app\n"
 	content += "EXPOSE 9000\n"
-	content += "COPY . .\n\n"
 	content += "CMD ["
 	content += strings.Join(cmds, ",")
 	content += "]"
