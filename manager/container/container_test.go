@@ -6,17 +6,9 @@ import (
 	"testing"
 )
 
-func beforeAll(t *testing.T) {
-	cwd, _ := os.Getwd()
-	t.Cleanup(func() {
-		os.Chdir(cwd)
-	})
-	os.Chdir("../")
-}
-
 func TestGetContainerID(t *testing.T) {
 	beforeAll(t)
-	service := "testservice"	
+	service := "testservice"
 	BuildAndCreate(service)
 	defer RemoveContainerAndImage(service)
 
@@ -24,13 +16,13 @@ func TestGetContainerID(t *testing.T) {
 	if cid == "" {
 		t.Fatalf("ContainerID is blank")
 	}
-	
+
 	fmt.Println(cid)
 }
 
 func TestAllContainers(t *testing.T) {
 	beforeAll(t)
-	service := "testservice"	
+	service := "testservice"
 	BuildAndCreate(service)
 	defer RemoveContainerAndImage(service)
 
@@ -44,13 +36,13 @@ func TestAllContainers(t *testing.T) {
 
 func TestRemove(t *testing.T) {
 	beforeAll(t)
-	service := "testservice"	
+	service := "testservice"
 	BuildAndCreate(service)
 	defer RemoveContainerAndImage(service)
-	
+
 	containers := FetchAllServices()
 	for _, v := range containers {
-		if v.Name == "/" + service {
+		if v.Name == "/"+service {
 			t.Fatal("Container is not deleted.")
 		}
 	}
