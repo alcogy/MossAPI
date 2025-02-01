@@ -6,7 +6,7 @@ import (
 )
 
 func TestExecuteBuildNonData(t *testing.T) {
-	backend := readFile("C:\\Users\\info\\Dev\\MossAPI\\samples\\files\\build.json")
+	backend := readFile("./build.json")
 	if len(backend.Services) > 0 {
 		t.Fatal("erorr")
 	}
@@ -25,7 +25,7 @@ func TestExecuteBuildNonData(t *testing.T) {
 }
 
 func TestExecuteBuild(t *testing.T) {
-	backend := readFile("C:\\Users\\info\\Dev\\MossAPI\\samples\\files\\test2.json")
+	backend := readFile("./test2.json")
 	if len(backend.Services) == 0 {
 		t.Fatal("erorr")
 	}
@@ -46,5 +46,19 @@ func TestExecuteBuild(t *testing.T) {
 		if v.TableName != "mytable1" {
 			t.Fatal("erorr")
 		}
+	}
+}
+
+func TestIsYaml(t *testing.T) {
+	yaml := isYaml("/home/test/test.yml")
+	if !yaml {
+		t.Fatal("expect True but False")
+	}
+}
+
+func TestIsNotYaml(t *testing.T) {
+	yaml := isYaml("/home/test/test.json")
+	if yaml {
+		t.Fatal("expect False but True")
 	}
 }

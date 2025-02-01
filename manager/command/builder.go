@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"fmt"
 	"manager/admin/models"
 	"manager/admin/types"
 	"manager/container"
@@ -9,7 +10,10 @@ import (
 	"manager/table"
 	"os"
 
+	"regexp"
+
 	"github.com/jmoiron/sqlx"
+	"gopkg.in/yaml.v3"
 )
 
 func ExecuteBuild(path string, db *sqlx.DB) {
@@ -39,7 +43,12 @@ func readFile(path string) Backend {
 	}
 
 	var backend Backend
-	err = json.Unmarshal(file, &backend)
+	if isYaml(path) {
+		err = yaml.Unmarshal(file, &backend)
+	} else {
+		err = json.Unmarshal(file, &backend)
+	}
+
 	if err != nil {
 		panic(err)
 	}
@@ -59,4 +68,16 @@ func buildTable(table table.Table, db *sqlx.DB) {
 		return
 	}
 	models.CreateTable(db, table)
+}
+
+func isYaml(path string) bool {
+	pattern := `.yml$`
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		fmt.Println("Error compiling regex:", err)
+		return false
+	}
+	matches := re.FindAllString(path, -1)
+
+	return len(matches) > 0
 }

@@ -7,11 +7,11 @@ import (
 )
 
 type DumpModel struct {
-	Services []container.ContainerFull `json:"services"`
-	Tables   []table.Table             `json:"tables"`
+	Services []container.ContainerFull `json:"services" yaml:"services"`
+	Tables   []table.Table             `json:"tables" yaml:"tables"`
 }
 
 type Backend struct {
-	Services []types.CreateServiceBody `json:"services"`
-	Tables   []table.Table             `json:"tables"`
+	Services []types.CreateServiceBody `json:"services" yaml:"services"`
+	Tables   []table.Table             `json:"tables" yaml:"tables"`
 }
