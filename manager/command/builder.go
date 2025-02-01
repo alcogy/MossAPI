@@ -12,11 +12,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Backend struct {
-	Services []types.CreateServiceBody `json:"services"`
-	Tables   []table.Table             `json:"tables"`
-}
-
 func ExecuteBuild(path string, db *sqlx.DB) {
 	backend := readFile(path)
 	for _, s := range backend.Services {

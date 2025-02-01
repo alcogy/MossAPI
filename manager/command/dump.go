@@ -10,11 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type DumpModel struct {
-	Services []container.ContainerFull `json:"services"`
-	Tables   []table.Table             `json:"tables"`
-}
-
 // Dump is export json file that service info and table info
 func Dump(path string, db *sqlx.DB) error {
 	// Get service data.
