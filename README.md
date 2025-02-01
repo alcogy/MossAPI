@@ -48,6 +48,16 @@ http://service:9000/:param
 http://localhost:9000/<service>/
 ```
 
+## MySQL
+You can use an external MySQL database.
+
+But if you want to use MySQL container, try this command.
+```shell
+docker build -t mysql <path to Dockerfile>
+docker run --name mysql -p 3306:3306 -e MYSQL_USER=user -e MYSQL_PASSWORD=pass -e MYSQL_ROOT_PASSWORD=pass -e MYSQL_DATABASE=mossapi -v ./data:/var/lib/mysql -v ./conf:/etc/mysql/conf.d -d mysql
+```
+
+
 ## Manager
 
 Management conteiner and database tables.
@@ -59,7 +69,7 @@ I provide web-based UI admin.
 On dvelopment.
 
 ```shell
-./go run . admin
+go run . admin
 ```
 
 On product.
