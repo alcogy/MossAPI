@@ -11,9 +11,9 @@ import (
 
 func Serve(mysql *sqlx.DB) {
 	e := echo.New()
-	
+
 	e.Use(middleware.Logger())
-  e.Use(middleware.Recover())
+	e.Use(middleware.Recover())
 	// CORS for debub.
 	e.Use(middleware.CORS())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -26,29 +26,31 @@ func Serve(mysql *sqlx.DB) {
 	e.GET("/", handler.GetIndexHtml)
 
 	// API.
-	e.GET("/api/infrastructure", func (c echo.Context) error {
+	e.GET("/api/infrastructure", func(c echo.Context) error {
 		return handler.GetInfrastructureInfo(c, mysql)
 	})
 
+	// API for service.
 	e.GET("/api/services", handler.GetAllServices)
 	e.POST("/api/service/create", handler.PostService)
 	e.POST("/api/service/start/:id", handler.StartService)
 	e.POST("/api/service/stop/:id", handler.StopService)
 	e.DELETE("/api/service/remove/:service", handler.RemoveService)
-	
-	e.GET("/api/tables", func (c echo.Context) error {
+
+	// API for database.
+	e.GET("/api/tables", func(c echo.Context) error {
 		return handler.GetAllTables(c, mysql)
 	})
-	e.GET("/api/table/:table", func (c echo.Context) error {
+	e.GET("/api/table/:table", func(c echo.Context) error {
 		return handler.GetTableDetail(c, mysql)
 	})
-	e.POST("/api/table", func (c echo.Context) error {
+	e.POST("/api/table", func(c echo.Context) error {
 		return handler.CrateTable(c, mysql)
 	})
-	e.DELETE("/api/table/:table", func (c echo.Context) error {
+	e.DELETE("/api/table/:table", func(c echo.Context) error {
 		return handler.DeleteTableDetail(c, mysql)
 	})
-	
+
 	go func() {
 		browser.OpenURL("http://localhost:5500")
 	}()

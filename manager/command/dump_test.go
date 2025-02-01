@@ -10,15 +10,17 @@ import (
 func beforeAll(t *testing.T) {
 	cwd, _ := os.Getwd()
 	t.Cleanup(func() {
+		// Restore current directory.
 		os.Chdir(cwd)
 	})
+	// Adjust current directry temporarily.
 	os.Chdir("../")
 }
 
 func TestDump(t *testing.T) {
 	beforeAll(t)
 	db, _ := table.Connection()
-	
+
 	err := Dump("./test.json", db)
 	if err != nil {
 		t.Fatal(err.Error())

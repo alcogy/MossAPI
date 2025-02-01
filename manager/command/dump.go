@@ -49,7 +49,7 @@ func fetchAllServices() []container.ContainerFull {
 		fmt.Println(err)
 		return []container.ContainerFull{}
 	}
-	
+
 	return cons
 }
 
