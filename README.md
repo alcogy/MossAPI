@@ -64,7 +64,7 @@ Management conteiner and database tables.
 You can simply make Dockerfile, docker container and database tables.
 I provide web-based UI admin.
 
-![Admin UI](/readme/screen_Admin.png)
+![Admin UI](/readme/screen_admin.png)
 
 ### How to use.
 
