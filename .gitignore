@@ -1,8 +1,9 @@
 /database/data
 /gateway/app/go.sum
-
+/manager/app/.env
 /services
 
 /manager/admin/ui/node_modules
 /manager/admin/ui/package-lock.json
 /manager/admin/ui/build
+/manager/.env
